@@ -13,6 +13,11 @@ cohorts:
     - HallAB_2017
     - IjazUZ_2017
   nielsen_country_restriction: "ESP"
+  species_snapshot_dates:
+    HMP_2019_ibdmdb: "2021-10-14"
+    HallAB_2017: "2021-10-14"
+    IjazUZ_2017: "2021-10-14"
+    NielsenHB_2014: "2021-03-31"
   pathway_snapshot_dates:
     HMP_2019_ibdmdb: "2021-10-14"
     HallAB_2017: "2021-10-14"
