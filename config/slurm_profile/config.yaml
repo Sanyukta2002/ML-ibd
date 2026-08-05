@@ -1,0 +1,12 @@
+executor: slurm
+jobs: 20
+default-resources:
+  slurm_account: "r01340"
+  slurm_partition: "general"
+  mem_mb: 8000
+  runtime: 60
+  cpus_per_task: 4
+conda-prefix: "/N/project/BacInteraction/schapag_cowrumen/ibd_crosscohort/.snakemake_conda"
+use-conda: true
+use-singularity: true
+singularity-args: "--bind /N/project/BacInteraction/schapag_cowrumen/ibd_crosscohort"

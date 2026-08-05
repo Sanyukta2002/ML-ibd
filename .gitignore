@@ -1,0 +1,31 @@
+# RStudio / R
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+# Snakemake
+.snakemake/
+.snakemake_conda/
+
+# Environments / containers
+venv/
+*.sif
+
+# Experiment tracking + regeneratable outputs
+mlruns/
+mlflow.db
+results/checkpoints/
+results/python_export/
+results/maaslin2/
+results/figures/
+
+# Misc
+.env
+.DS_Store

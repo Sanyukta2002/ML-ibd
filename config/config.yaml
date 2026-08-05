@@ -1,0 +1,53 @@
+paths:
+  results_dir: "results"
+  checkpoints_dir: "results/checkpoints"
+  tables_dir: "results/tables"
+  figures_dir: "results/figures"
+  maaslin2_dir: "results/maaslin2"
+  python_export_dir: "results/python_export"
+
+cohorts:
+  selected_studies:
+    - NielsenHB_2014
+    - HMP_2019_ibdmdb
+    - HallAB_2017
+    - IjazUZ_2017
+  nielsen_country_restriction: "ESP"
+
+species_filter:
+  abund_threshold: 0.01
+  prev_threshold: 0.10
+  majority_cohort_prevalence: 0.05
+  majority_cohort_min_n: 3
+
+maaslin2:
+  normalization: "TSS"
+  transform: "LOG"
+  analysis_method: "LM"
+  correction: "BH"
+  qval_threshold_primary: 0.05
+  qval_threshold_secondary: 0.25
+  tier2_age_cohorts:
+    - HMP_2019_ibdmdb
+    - IjazUZ_2017
+    - NielsenHB_2014
+
+rfe:
+  seed: 123
+  cv_folds: 10
+  panel_sizes: [7, 13, 20]
+
+nested_cv:
+  n_splits: 10
+  n_repeats: 5
+  n_inner_splits: 5
+  n_trials: 30
+  random_state: 123
+  models:
+    - random_forest
+    - xgboost
+    - lightgbm
+    - elasticnet
+
+mlflow:
+  experiment_name: "ibd-crosscohort"
