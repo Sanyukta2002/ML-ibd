@@ -31,3 +31,24 @@ rule species_abundance_pull:
         runtime = 15
     shell:
         "Rscript scripts/r/02_species_abundance_pull.R > {log} 2>&1"
+
+rule species_filter_dedup:
+    input:
+        checkpoint = f"{config['paths']['checkpoints_dir']}/pooled_data.rds",
+        config = "config/config.yaml"
+    output:
+        checkpoint = f"{config['paths']['checkpoints_dir']}/pooled_data_filtered.rds",
+        final_species = f"{config['paths']['checkpoints_dir']}/final_species.rds",
+        funnel = f"{config['paths']['tables_dir']}/step5_species_filtering_funnel.csv",
+        filter_detail = f"{config['paths']['tables_dir']}/step5_species_filter_detail.csv",
+        dedup_investigation = f"{config['paths']['tables_dir']}/step5b_species_duplicate_investigation.csv",
+        dedup_summary = f"{config['paths']['tables_dir']}/step5b_species_dedup_summary.csv"
+    log:
+        "logs/species_filter_dedup.log"
+    container:
+        "envs/bioconductor.sif"
+    resources:
+        mem_mb = 4000,
+        runtime = 15
+    shell:
+        "Rscript scripts/r/03_species_filter_dedup.R > {log} 2>&1"

@@ -4,4 +4,4 @@ include: "rules/species.smk"
 
 rule all:
     input:
-        f"{config['paths']['checkpoints_dir']}/baseline_metadata.rds"
+        f"{config['paths']['checkpoints_dir']}/pooled_data_filtered.rds"
