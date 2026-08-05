@@ -13,12 +13,28 @@ cohorts:
     - HallAB_2017
     - IjazUZ_2017
   nielsen_country_restriction: "ESP"
+  pathway_snapshot_dates:
+    HMP_2019_ibdmdb: "2021-10-14"
+    HallAB_2017: "2021-10-14"
+    IjazUZ_2017: "2021-10-14"
+    NielsenHB_2014: "2021-03-31"
 
 species_filter:
   abund_threshold: 0.01
   prev_threshold: 0.10
   majority_cohort_prevalence: 0.05
   majority_cohort_min_n: 3
+
+pathway_filter:
+  abund_threshold: 0.0001
+  prev_threshold: 0.10
+  majority_cohort_prevalence: 0.05
+  majority_cohort_min_n: 3
+  drop_zero_total_samples: true
+
+dedup:
+  correlation_flag_threshold: 0.9999999
+  method: "spearman"
 
 maaslin2:
   normalization: "TSS"
@@ -32,10 +48,21 @@ maaslin2:
     - IjazUZ_2017
     - NielsenHB_2014
 
+wilcoxon:
+  qval_threshold: 0.05
+
+gfc:
+  quantile_range: [0.1, 0.9, 0.05]
+
 rfe:
   seed: 123
   cv_folds: 10
   panel_sizes: [7, 13, 20]
+
+python_preprocessing:
+  clr_transform: true
+  pseudocount_method: "half_min_nonzero"
+  feature_scaling: "standard"
 
 nested_cv:
   n_splits: 10
