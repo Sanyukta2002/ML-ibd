@@ -52,3 +52,24 @@ rule species_filter_dedup:
         runtime = 15
     shell:
         "Rscript scripts/r/03_species_filter_dedup.R > {log} 2>&1"
+
+rule species_diversity_permanova:
+    input:
+        checkpoint = f"{config['paths']['checkpoints_dir']}/pooled_data.rds",
+        config = "config/config.yaml"
+    output:
+        checkpoint = f"{config['paths']['checkpoints_dir']}/diversity_df.rds",
+        permanova_summary = f"{config['paths']['tables_dir']}/step6_permanova_summary.csv",
+        diversity_group_summary = f"{config['paths']['tables_dir']}/step7_diversity_group_summary.csv",
+        diversity_test_summary = f"{config['paths']['tables_dir']}/step7_diversity_test_summary.csv",
+        figure_pdf = f"{config['paths']['figures_dir']}/step7_diversity_combined.pdf",
+        figure_png = f"{config['paths']['figures_dir']}/step7_diversity_combined.png"
+    log:
+        "logs/species_diversity_permanova.log"
+    container:
+        "envs/bioconductor.sif"
+    resources:
+        mem_mb = 4000,
+        runtime = 20
+    shell:
+        "Rscript scripts/r/04_diversity_permanova.R > {log} 2>&1"

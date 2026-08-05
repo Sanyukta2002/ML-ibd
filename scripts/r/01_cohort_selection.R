@@ -5,6 +5,24 @@
 # per subject. Produces the checkpoint everything downstream depends on.
 # ============================================================
 
+# NOTE on sampleMetadata reproducibility: unlike relative_abundance/
+# pathway_abundance (ExperimentHub resources with pinnable snapshot
+# dates), sampleMetadata is a static data.frame baked into the
+# installed curatedMetagenomicData package version itself (confirmed:
+# no date/version attributes exist on the object). Reproducibility
+# here comes from the container's pinned package version (3.12.0,
+# see sessionInfo logs), not from a pull-pattern argument.
+#
+# KNOWN CONSEQUENCE: age completeness for NielsenHB_2014 differs from
+# the original exploratory run -- this rebuild finds 0 of 141
+# NielsenHB_2014 samples with non-NA age (investigated 2026-08-05),
+# vs. the original run's age-adjusted Tier 2 subset of n=314 across
+# the 3 age-available cohorts (this rebuild: n=173). Consistent with
+# the same package/database version drift documented in
+# 02_species_abundance_pull.R (788 vs 781 taxa). Downstream scripts
+# must NOT hardcode the original n=314 assertion -- log actual n
+# instead.
+
 library(here)
 library(yaml)
 library(curatedMetagenomicData)
