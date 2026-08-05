@@ -129,3 +129,23 @@ rule species_maaslin2_tier2_age:
         runtime = 20
     shell:
         "Rscript scripts/r/07_maaslin2_tier2_age.R > {log} 2>&1"
+
+rule species_maaslin2_tier_overlap:
+    input:
+        fit_tier1 = f"{config['paths']['checkpoints_dir']}/fit_tier1.rds",
+        tier2_group_results = f"{config['paths']['checkpoints_dir']}/tier2_group_results.rds",
+        config = "config/config.yaml"
+    output:
+        checkpoint = f"{config['paths']['checkpoints_dir']}/robust_core_tier1_tier2.rds",
+        comparison = f"{config['paths']['tables_dir']}/step10_tier1_tier2_comparison.csv",
+        robust_core = f"{config['paths']['tables_dir']}/step10_robust_core_tier1_tier2.csv",
+        overlap_summary = f"{config['paths']['tables_dir']}/step10_tier_overlap_summary.csv"
+    log:
+        "logs/species_maaslin2_tier_overlap.log"
+    container:
+        "envs/bioconductor.sif"
+    resources:
+        mem_mb = 2000,
+        runtime = 10
+    shell:
+        "Rscript scripts/r/08_maaslin2_tier_overlap.R > {log} 2>&1"
