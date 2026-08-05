@@ -9,4 +9,4 @@ default-resources:
 conda-prefix: "/N/project/BacInteraction/schapag_cowrumen/ibd_crosscohort/.snakemake_conda"
 use-conda: true
 use-singularity: true
-singularity-args: "--bind /N/project/BacInteraction/schapag_cowrumen/ibd_crosscohort"
+singularity-args: "--bind /N/project/BacInteraction/schapag_cowrumen/ibd_crosscohort --env R_LIBS_USER=/N/project/BacInteraction/schapag_cowrumen/ibd_crosscohort/envs/r_libs"

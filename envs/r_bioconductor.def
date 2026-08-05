@@ -1,0 +1,24 @@
+Bootstrap: docker
+From: bioconductor/bioconductor_docker:RELEASE_3_19
+
+# ============================================================
+# R/Bioconductor environment for the IBD cross-cohort pipeline.
+#
+# NOTE on build approach: this project's HPC does not have
+# fakeroot/subuid-subgid enabled for unprivileged Apptainer builds,
+# so this image is used AS-IS from Bioconductor's official build —
+# no %post install step here. Package installation happens
+# separately, into an external bind-mounted library, via
+# scripts/r/setup/install_r_packages.R — see that file for the
+# full package list. This keeps the container itself a simple,
+# verifiable pull (no privileged build step required) while still
+# giving a fully reproducible, versioned install recipe.
+#
+# Base image confirmed to provide R 4.4.1 (verified via
+# R.version.string at build time, 2026-08-05).
+#
+# To rebuild:
+#   apptainer pull envs/bioconductor.sif docker://bioconductor/bioconductor_docker:RELEASE_3_19
+#   apptainer exec --bind <project_root>:/proj --env R_LIBS_USER=/proj/envs/r_libs \
+#     envs/bioconductor.sif Rscript /proj/scripts/r/setup/install_r_packages.R
+# ============================================================

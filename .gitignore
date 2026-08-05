@@ -29,3 +29,7 @@ results/figures/
 # Misc
 .env
 .DS_Store
+logs/
+envs/*.sif
+envs/r_libs/
+envs/python_ml/
