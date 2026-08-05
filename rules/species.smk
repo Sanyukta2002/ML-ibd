@@ -109,3 +109,23 @@ rule species_maaslin2_tier1:
         runtime = 20
     shell:
         "Rscript scripts/r/06_maaslin2_tier1.R > {log} 2>&1"
+
+rule species_maaslin2_tier2_age:
+    input:
+        checkpoint = f"{config['paths']['checkpoints_dir']}/pooled_data_filtered.rds",
+        final_species = f"{config['paths']['checkpoints_dir']}/final_species.rds",
+        covariate_availability = f"{config['paths']['checkpoints_dir']}/covariate_availability.rds",
+        config = "config/config.yaml"
+    output:
+        checkpoint = f"{config['paths']['checkpoints_dir']}/fit_tier2.rds",
+        group_results = f"{config['paths']['checkpoints_dir']}/tier2_group_results.rds",
+        hit_summary = f"{config['paths']['tables_dir']}/step9_maaslin2_tier2_hit_summary.csv"
+    log:
+        "logs/species_maaslin2_tier2_age.log"
+    container:
+        "envs/bioconductor.sif"
+    resources:
+        mem_mb = 4000,
+        runtime = 20
+    shell:
+        "Rscript scripts/r/07_maaslin2_tier2_age.R > {log} 2>&1"

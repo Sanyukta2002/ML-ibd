@@ -41,7 +41,11 @@ fit_tier1 <- Maaslin2(
   correction      = cfg$maaslin2$correction,
   min_prevalence  = 0,      # already filtered upstream
   min_abundance   = 0,      # already filtered upstream
-  standardize     = TRUE
+  standardize     = TRUE,
+  plot_scatter    = FALSE   # see 07_maaslin2_tier2_age.R for rationale
+                             # (no continuous fixed effect here, so this
+                             # never actually triggers -- added for
+                             # consistency, not because Tier1 failed)
 )
 
 tier1_hit_summary <- data.frame(
