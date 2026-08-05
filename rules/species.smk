@@ -149,3 +149,24 @@ rule species_maaslin2_tier_overlap:
         runtime = 10
     shell:
         "Rscript scripts/r/08_maaslin2_tier_overlap.R > {log} 2>&1"
+
+rule species_wilcoxon:
+    input:
+        checkpoint = f"{config['paths']['checkpoints_dir']}/pooled_data_filtered.rds",
+        final_species = f"{config['paths']['checkpoints_dir']}/final_species.rds",
+        fit_tier1 = f"{config['paths']['checkpoints_dir']}/fit_tier1.rds",
+        config = "config/config.yaml"
+    output:
+        checkpoint = f"{config['paths']['checkpoints_dir']}/blocked_wilcox_df.rds",
+        name_map = f"{config['paths']['checkpoints_dir']}/name_map2.rds",
+        hit_summary = f"{config['paths']['tables_dir']}/step12_wilcoxon_hit_summary.csv",
+        full_results = f"{config['paths']['tables_dir']}/step12_wilcoxon_full_results.csv"
+    log:
+        "logs/species_wilcoxon.log"
+    container:
+        "envs/bioconductor.sif"
+    resources:
+        mem_mb = 4000,
+        runtime = 20
+    shell:
+        "Rscript scripts/r/09_species_wilcoxon.R > {log} 2>&1"
