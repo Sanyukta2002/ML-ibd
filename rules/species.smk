@@ -170,3 +170,25 @@ rule species_wilcoxon:
         runtime = 20
     shell:
         "Rscript scripts/r/09_species_wilcoxon.R > {log} 2>&1"
+
+rule species_triple_candidates:
+    input:
+        checkpoint = f"{config['paths']['checkpoints_dir']}/pooled_data_filtered.rds",
+        fit_tier1 = f"{config['paths']['checkpoints_dir']}/fit_tier1.rds",
+        tier2_group_results = f"{config['paths']['checkpoints_dir']}/tier2_group_results.rds",
+        blocked_wilcox_df = f"{config['paths']['checkpoints_dir']}/blocked_wilcox_df.rds",
+        name_map = f"{config['paths']['checkpoints_dir']}/name_map2.rds",
+        config = "config/config.yaml"
+    output:
+        checkpoint = f"{config['paths']['checkpoints_dir']}/triple_candidates.rds",
+        funnel = f"{config['paths']['tables_dir']}/step13_selection_funnel.csv",
+        candidates = f"{config['paths']['tables_dir']}/step13_triple_candidates.csv"
+    log:
+        "logs/species_triple_candidates.log"
+    container:
+        "envs/bioconductor.sif"
+    resources:
+        mem_mb = 2000,
+        runtime = 10
+    shell:
+        "Rscript scripts/r/10_species_triple_candidates.R > {log} 2>&1"
