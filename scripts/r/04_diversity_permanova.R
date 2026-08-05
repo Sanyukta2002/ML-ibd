@@ -50,10 +50,10 @@ run_covariate_permanova <- function(covariate, cohorts_with_covariate) {
   list(n = nrow(d), result = result)
 }
 
-age_cohorts <- cfg$maaslin2$tier2_age_cohorts
-age_check    <- run_covariate_permanova("age", age_cohorts)
-gender_check <- run_covariate_permanova("gender", c("HMP_2019_ibdmdb", "NielsenHB_2014"))
-bmi_check    <- run_covariate_permanova("BMI", c("HMP_2019_ibdmdb", "NielsenHB_2014"))
+covariate_availability <- readRDS(here(cfg$paths$checkpoints_dir, "covariate_availability.rds"))
+age_check    <- run_covariate_permanova("age", covariate_availability$age)
+gender_check <- run_covariate_permanova("gender", covariate_availability$gender)
+bmi_check    <- run_covariate_permanova("BMI", covariate_availability$bmi)
 
 extract_permanova_row <- function(res, model_name, n) {
   df <- as.data.frame(res)

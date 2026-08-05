@@ -56,6 +56,7 @@ rule species_filter_dedup:
 rule species_diversity_permanova:
     input:
         checkpoint = f"{config['paths']['checkpoints_dir']}/pooled_data.rds",
+        covariate_availability = f"{config['paths']['checkpoints_dir']}/covariate_availability.rds",
         config = "config/config.yaml"
     output:
         checkpoint = f"{config['paths']['checkpoints_dir']}/diversity_df.rds",
@@ -73,3 +74,20 @@ rule species_diversity_permanova:
         runtime = 20
     shell:
         "Rscript scripts/r/04_diversity_permanova.R > {log} 2>&1"
+
+rule covariate_availability_check:
+    input:
+        checkpoint = f"{config['paths']['checkpoints_dir']}/pooled_data.rds",
+        config = "config/config.yaml"
+    output:
+        checkpoint = f"{config['paths']['checkpoints_dir']}/covariate_availability.rds",
+        table = f"{config['paths']['tables_dir']}/step_covariate_availability_by_cohort.csv"
+    log:
+        "logs/covariate_availability_check.log"
+    container:
+        "envs/bioconductor.sif"
+    resources:
+        mem_mb = 2000,
+        runtime = 10
+    shell:
+        "Rscript scripts/r/05_covariate_availability_check.R > {log} 2>&1"

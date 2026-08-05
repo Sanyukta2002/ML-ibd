@@ -37,6 +37,11 @@ pathway_filter:
   majority_cohort_min_n: 3
   drop_zero_total_samples: true
 
+covariate_availability:
+  min_usable_pct: 50   # reverse-engineered from the original script's
+  # hardcoded cohort lists -- a 50% presence threshold exactly
+  # reconstructs its (undocumented) gender/BMI cohort choices
+
 dedup:
   correlation_flag_threshold: 0.9999999
   method: "spearman"
