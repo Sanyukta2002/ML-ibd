@@ -112,7 +112,9 @@ meta_for_merge <- baseline_metadata %>%
 pooled_data <- meta_for_merge %>%
   dplyr::inner_join(abundance_df, by = "sample_id")
 
-stopifnot(nrow(pooled_data) == 353)
+cat("pooled_data sample count:", nrow(pooled_data),
+    "(should match baseline_metadata count from Step 1-3 -- verified via join, not a magic number)\n")
+stopifnot(nrow(pooled_data) == nrow(baseline_metadata))  # internal consistency: join shouldn't drop/add samples
 stopifnot(anyDuplicated(pooled_data$sample_id) == 0)
 
 cat("pooled_data dimensions:", paste(dim(pooled_data), collapse = " x "), "\n")

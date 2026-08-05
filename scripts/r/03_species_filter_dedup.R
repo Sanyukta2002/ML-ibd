@@ -84,7 +84,7 @@ species_filter_detail <- data.frame(
 write.csv(species_filter_detail, here(cfg$paths$tables_dir, "step5_species_filter_detail.csv"), row.names = FALSE)
 
 pooled_data_filtered <- pooled_data[, c(meta_cols, final_species)]
-stopifnot(nrow(pooled_data_filtered) == 353)
+stopifnot(nrow(pooled_data_filtered) == nrow(pooled_data))  # column-only filter must not change row count
 cat("Final filtered species set:", length(final_species), "species\n")
 
 # ============================================================
@@ -181,7 +181,7 @@ write.csv(dedup_summary_sp, here(cfg$paths$tables_dir, "step5b_species_dedup_sum
 pooled_data_filtered <- pooled_data_filtered[, c(meta_cols, final_species_deduped)]
 final_species <- final_species_deduped
 
-stopifnot(nrow(pooled_data_filtered) == 353)
+stopifnot(nrow(pooled_data_filtered) == nrow(pooled_data))  # dedup is also column-only
 cat("Final deduped species set:", length(final_species), "species,", nrow(pooled_data_filtered), "samples\n")
 
 saveRDS(pooled_data_filtered, here(cfg$paths$checkpoints_dir, "pooled_data_filtered.rds"))
