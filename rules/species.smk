@@ -91,3 +91,21 @@ rule covariate_availability_check:
         runtime = 10
     shell:
         "Rscript scripts/r/05_covariate_availability_check.R > {log} 2>&1"
+
+rule species_maaslin2_tier1:
+    input:
+        checkpoint = f"{config['paths']['checkpoints_dir']}/pooled_data_filtered.rds",
+        final_species = f"{config['paths']['checkpoints_dir']}/final_species.rds",
+        config = "config/config.yaml"
+    output:
+        checkpoint = f"{config['paths']['checkpoints_dir']}/fit_tier1.rds",
+        hit_summary = f"{config['paths']['tables_dir']}/step8_maaslin2_tier1_hit_summary.csv"
+    log:
+        "logs/species_maaslin2_tier1.log"
+    container:
+        "envs/bioconductor.sif"
+    resources:
+        mem_mb = 4000,
+        runtime = 20
+    shell:
+        "Rscript scripts/r/06_maaslin2_tier1.R > {log} 2>&1"
