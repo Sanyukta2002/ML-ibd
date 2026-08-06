@@ -88,3 +88,8 @@ nested_cv:
 
 mlflow:
   experiment_name: "ibd-crosscohort"
+  tracking_host: "h2.quartz.uits.iu.edu"   # login node running the tracking server
+  tracking_port: 5050
+  # backend store / artifact root paths are set at server startup
+  # (see scripts/start_mlflow_server.sh), not read from here directly,
+  # since the server is a separate standing process from any single job
