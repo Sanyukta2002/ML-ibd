@@ -112,3 +112,22 @@ rule pathway_triple_candidates:
     container: "envs/bioconductor.sif"
     resources: mem_mb = 2000, runtime = 10
     shell: "Rscript scripts/r/19_pathway_triple_candidates.R > {log} 2>&1"
+
+rule pathway_rfe:
+    input:
+        checkpoint = f"{config['paths']['checkpoints_dir']}/triple_candidates_pathway.rds",
+        pooled = f"{config['paths']['checkpoints_dir']}/pooled_data_pathway_final.rds",
+        config = "config/config.yaml"
+    output:
+        checkpoint = f"{config['paths']['checkpoints_dir']}/all_panels_pathway.rds",
+        rfe_result = f"{config['paths']['checkpoints_dir']}/rfe_result_pathway.rds",
+        results_by_size = f"{config['paths']['tables_dir']}/step_pathway_rfe_results_by_size.csv",
+        elbow_sizes = f"{config['paths']['tables_dir']}/step_pathway_rfe_elbow_sizes.csv",
+        panel_definitions = f"{config['paths']['tables_dir']}/step_pathway_panel_definitions.csv",
+        panel_summary = f"{config['paths']['tables_dir']}/step_pathway_final_panels.csv",
+        figure_pdf = f"{config['paths']['figures_dir']}/step_pathway_rfe_auc_vs_panelsize.pdf",
+        figure_png = f"{config['paths']['figures_dir']}/step_pathway_rfe_auc_vs_panelsize.png"
+    log: "logs/pathway_rfe.log"
+    container: "envs/bioconductor.sif"
+    resources: mem_mb = 8000, runtime = 60
+    shell: "Rscript scripts/r/20_pathway_rfe.R > {log} 2>&1"
