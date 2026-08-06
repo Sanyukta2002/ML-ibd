@@ -2,6 +2,7 @@ configfile: "config/config.yaml"
 
 include: "rules/species.smk"
 include: "rules/pathway.smk"
+include: "rules/mlflow_test.smk"
 
 rule all:
     input:

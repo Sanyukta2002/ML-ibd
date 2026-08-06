@@ -33,3 +33,4 @@ logs/
 envs/*.sif
 envs/r_libs/
 envs/python_ml/
+.cache/

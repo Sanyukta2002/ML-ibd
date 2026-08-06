@@ -131,3 +131,20 @@ rule pathway_rfe:
     container: "envs/bioconductor.sif"
     resources: mem_mb = 8000, runtime = 60
     shell: "Rscript scripts/r/20_pathway_rfe.R > {log} 2>&1"
+
+rule export_for_python:
+    input:
+        species = f"{config['paths']['checkpoints_dir']}/pooled_data_filtered.rds",
+        species_panels = f"{config['paths']['checkpoints_dir']}/all_panels.rds",
+        pathway = f"{config['paths']['checkpoints_dir']}/pooled_data_pathway_final.rds",
+        pathway_panels = f"{config['paths']['checkpoints_dir']}/all_panels_pathway.rds",
+        config = "config/config.yaml"
+    output:
+        species_csv = f"{config['paths']['python_export_dir']}/species_full_filtered.csv",
+        pathway_csv = f"{config['paths']['python_export_dir']}/pathway_full_filtered.csv",
+        species_membership = f"{config['paths']['python_export_dir']}/species_panel_membership.csv",
+        pathway_membership = f"{config['paths']['python_export_dir']}/pathway_panel_membership.csv"
+    log: "logs/export_for_python.log"
+    container: "envs/bioconductor.sif"
+    resources: mem_mb = 2000, runtime = 10
+    shell: "Rscript scripts/r/21_export_for_python.R > {log} 2>&1"
