@@ -23,3 +23,19 @@ rule pathway_filter_dedup:
     container: "envs/bioconductor.sif"
     resources: mem_mb = 4000, runtime = 15
     shell: "Rscript scripts/r/13_pathway_filter_dedup.R > {log} 2>&1"
+
+rule pathway_diversity_permanova:
+    input:
+        pooled = f"{config['paths']['checkpoints_dir']}/pooled_data_pathway.rds",
+        covariate_availability = f"{config['paths']['checkpoints_dir']}/covariate_availability.rds",
+        config = "config/config.yaml"
+    output:
+        checkpoint = f"{config['paths']['checkpoints_dir']}/diversity_df_pathway.rds",
+        permanova = f"{config['paths']['tables_dir']}/step_pathway_permanova_summary.csv",
+        diversity_test = f"{config['paths']['tables_dir']}/step_pathway_diversity_test_summary.csv",
+        figure_pdf = f"{config['paths']['figures_dir']}/step_pathway_diversity_combined.pdf",
+        figure_png = f"{config['paths']['figures_dir']}/step_pathway_diversity_combined.png"
+    log: "logs/pathway_diversity_permanova.log"
+    container: "envs/bioconductor.sif"
+    resources: mem_mb = 4000, runtime = 20
+    shell: "Rscript scripts/r/14_pathway_diversity_permanova.R > {log} 2>&1"
