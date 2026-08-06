@@ -97,3 +97,18 @@ rule pathway_wilcoxon:
     container: "envs/bioconductor.sif"
     resources: mem_mb = 4000, runtime = 20
     shell: "Rscript scripts/r/18_pathway_wilcoxon.R > {log} 2>&1"
+
+rule pathway_triple_candidates:
+    input:
+        pooled = f"{config['paths']['checkpoints_dir']}/pooled_data_pathway_final.rds",
+        fit_tier1 = f"{config['paths']['checkpoints_dir']}/fit_tier1_pathway.rds",
+        blocked_wilcox_df = f"{config['paths']['checkpoints_dir']}/blocked_wilcox_df_pathway.rds",
+        name_map = f"{config['paths']['checkpoints_dir']}/name_map_pathway.rds",
+        config = "config/config.yaml"
+    output:
+        checkpoint = f"{config['paths']['checkpoints_dir']}/triple_candidates_pathway.rds",
+        candidates = f"{config['paths']['tables_dir']}/step_pathway_triple_candidates.csv"
+    log: "logs/pathway_triple_candidates.log"
+    container: "envs/bioconductor.sif"
+    resources: mem_mb = 2000, runtime = 10
+    shell: "Rscript scripts/r/19_pathway_triple_candidates.R > {log} 2>&1"

@@ -1,0 +1,2 @@
+"feature_stripped","pathway","coef_maaslin_tier1","qval_maaslin_tier1","statistic_wilcox_corrected","pval_wilcox","qval_wilcox","sign_agree_maaslin_wilcox","gFC","gfc_maaslin_agree","gfc_wilcox_agree"
+"pwy4984ureacycle","PWY-4984: urea cycle",-0.444562524380517,0.248981896158004,-2.76285206524044,0.00572987297840388,0.0153664775329922,TRUE,0.042174900773108,FALSE,FALSE
