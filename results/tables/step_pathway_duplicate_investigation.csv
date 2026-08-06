@@ -1,0 +1,5 @@
+"f1","f2","identical"
+"ILEUSYN-PWY: L-isoleucine biosynthesis I (from threonine)","VALSYN-PWY: L-valine biosynthesis",TRUE
+"PWY-6122: 5-aminoimidazole ribonucleotide biosynthesis II","PWY-6277: superpathway of 5-aminoimidazole ribonucleotide biosynthesis",TRUE
+"PWY-7220: adenosine deoxyribonucleotides de novo biosynthesis II","PWY-7222: guanosine deoxyribonucleotides de novo biosynthesis II",TRUE
+"PWY4FS-7: phosphatidylglycerol biosynthesis I (plastidic)","PWY4FS-8: phosphatidylglycerol biosynthesis II (non-plastidic)",FALSE

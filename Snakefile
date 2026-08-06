@@ -1,6 +1,7 @@
 configfile: "config/config.yaml"
 
 include: "rules/species.smk"
+include: "rules/pathway.smk"
 
 rule all:
     input:
