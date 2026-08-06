@@ -67,7 +67,7 @@ gfc:
 rfe:
   seed: 123
   cv_folds: 10
-  panel_sizes: [7, 13, 20]
+  panel_sizes: [7, 13, 19]  # 19 capped to match available triple-candidate pool (was 20 for original 35-species pool)
 
 python_preprocessing:
   clr_transform: true

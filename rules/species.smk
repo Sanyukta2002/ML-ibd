@@ -192,3 +192,26 @@ rule species_triple_candidates:
         runtime = 10
     shell:
         "Rscript scripts/r/10_species_triple_candidates.R > {log} 2>&1"
+
+rule species_rfe:
+    input:
+        checkpoint = f"{config['paths']['checkpoints_dir']}/triple_candidates.rds",
+        pooled = f"{config['paths']['checkpoints_dir']}/pooled_data_filtered.rds",
+        config = "config/config.yaml"
+    output:
+        checkpoint = f"{config['paths']['checkpoints_dir']}/all_panels.rds",
+        rfe_result = f"{config['paths']['checkpoints_dir']}/rfe_result.rds",
+        results_by_size = f"{config['paths']['tables_dir']}/step14_rfe_results_by_size.csv",
+        elbow_sizes = f"{config['paths']['tables_dir']}/step14_rfe_elbow_sizes.csv",
+        panel_summary = f"{config['paths']['tables_dir']}/step14_final_panels.csv",
+        figure_pdf = f"{config['paths']['figures_dir']}/step14_rfe_auc_vs_panelsize.pdf",
+        figure_png = f"{config['paths']['figures_dir']}/step14_rfe_auc_vs_panelsize.png"
+    log:
+        "logs/species_rfe.log"
+    container:
+        "envs/bioconductor.sif"
+    resources:
+        mem_mb = 8000,
+        runtime = 60
+    shell:
+        "Rscript scripts/r/11_species_rfe.R > {log} 2>&1"

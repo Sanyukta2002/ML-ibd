@@ -1,0 +1,4 @@
+"panel_name","panel_size","definition"
+"rfe_optimum",17,"RFE global optimum (best CV ROC)"
+"rfe_parsimony",12,"Tolerance-based parsimonious size (1% of optimum)"
+"rfe_full_pool",19,"Full triple-candidate pool (unranked)"
