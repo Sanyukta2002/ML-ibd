@@ -39,3 +39,31 @@ rule pathway_diversity_permanova:
     container: "envs/bioconductor.sif"
     resources: mem_mb = 4000, runtime = 20
     shell: "Rscript scripts/r/14_pathway_diversity_permanova.R > {log} 2>&1"
+
+rule pathway_maaslin2_tier1:
+    input:
+        pooled = f"{config['paths']['checkpoints_dir']}/pooled_data_pathway_final.rds",
+        final_pathways = f"{config['paths']['checkpoints_dir']}/final_pathways.rds",
+        config = "config/config.yaml"
+    output:
+        checkpoint = f"{config['paths']['checkpoints_dir']}/fit_tier1_pathway.rds",
+        hit_summary = f"{config['paths']['tables_dir']}/step_pathway_maaslin2_tier1_hit_summary.csv"
+    log: "logs/pathway_maaslin2_tier1.log"
+    container: "envs/bioconductor.sif"
+    resources: mem_mb = 4000, runtime = 20
+    shell: "Rscript scripts/r/15_pathway_maaslin2_tier1.R > {log} 2>&1"
+
+rule pathway_maaslin2_tier2_age:
+    input:
+        pooled = f"{config['paths']['checkpoints_dir']}/pooled_data_pathway_final.rds",
+        final_pathways = f"{config['paths']['checkpoints_dir']}/final_pathways.rds",
+        covariate_availability = f"{config['paths']['checkpoints_dir']}/covariate_availability.rds",
+        config = "config/config.yaml"
+    output:
+        checkpoint = f"{config['paths']['checkpoints_dir']}/fit_tier2_pathway.rds",
+        group_results = f"{config['paths']['checkpoints_dir']}/tier2_group_results_pathway.rds",
+        hit_summary = f"{config['paths']['tables_dir']}/step_pathway_maaslin2_tier2_hit_summary.csv"
+    log: "logs/pathway_maaslin2_tier2_age.log"
+    container: "envs/bioconductor.sif"
+    resources: mem_mb = 4000, runtime = 20
+    shell: "Rscript scripts/r/16_pathway_maaslin2_tier2_age.R > {log} 2>&1"
