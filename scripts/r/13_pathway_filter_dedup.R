@@ -9,6 +9,12 @@ pathway_cols <- setdiff(colnames(pooled_data_pathway), meta_cols)
 pw_matrix <- as.matrix(pooled_data_pathway[, pathway_cols])
 rownames(pw_matrix) <- pooled_data_pathway$sample_id
 
+row_sum_summary <- summary(rowSums(pw_matrix, na.rm = TRUE))
+print(row_sum_summary)
+# pathway_abundance is 0-1 scale (unlike species' 0-100) -- confirm median is
+# well below 50 as the scale sanity check here, mirroring species' check
+stopifnot(row_sum_summary["Median"] < 50)
+
 abund_threshold <- cfg$pathway_filter$abund_threshold
 prev_threshold  <- cfg$pathway_filter$prev_threshold
 majority_prev   <- cfg$pathway_filter$majority_cohort_prevalence
