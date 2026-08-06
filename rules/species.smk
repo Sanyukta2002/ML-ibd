@@ -182,7 +182,8 @@ rule species_triple_candidates:
     output:
         checkpoint = f"{config['paths']['checkpoints_dir']}/triple_candidates.rds",
         funnel = f"{config['paths']['tables_dir']}/step13_selection_funnel.csv",
-        candidates = f"{config['paths']['tables_dir']}/step13_triple_candidates.csv"
+        candidates = f"{config['paths']['tables_dir']}/step13_triple_candidates.csv",
+        correlation_recheck = f"{config['paths']['tables_dir']}/step13_final_candidates_correlation_recheck.csv"
     log:
         "logs/species_triple_candidates.log"
     container:

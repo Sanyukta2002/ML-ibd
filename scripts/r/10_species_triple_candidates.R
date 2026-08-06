@@ -121,6 +121,22 @@ selection_funnel <- data.frame(
 print(selection_funnel)
 write.csv(selection_funnel, here(cfg$paths$tables_dir, "step13_selection_funnel.csv"), row.names = FALSE)
 
+# ---- Post-selection correlation re-check (confirmatory -- Step 5b
+# already deduped upstream, this confirms nothing slipped through
+# to this late stage; ported from pathway's equivalent check) ----
+if (nrow(triple_candidates_clean) >= 2) {
+  cor_matrix_final <- cor(as.matrix(pooled_data_filtered[, triple_candidates_clean$species]), method = cfg$dedup$method)
+  high_cor_idx <- which(cor_matrix_final > cfg$dedup$correlation_flag_threshold & upper.tri(cor_matrix_final), arr.ind = TRUE)
+  high_cor_df <- data.frame(f1 = rownames(cor_matrix_final)[high_cor_idx[,1]], f2 = colnames(cor_matrix_final)[high_cor_idx[,2]])
+  if (nrow(high_cor_df) > 0) {
+    high_cor_df$identical <- mapply(function(a,b) identical(pooled_data_filtered[[a]], pooled_data_filtered[[b]]), high_cor_df$f1, high_cor_df$f2)
+  } else high_cor_df$identical <- logical(0)
+  cat("Post-selection correlation re-check:", nrow(high_cor_df), "high-correlation pairs found (",
+      sum(high_cor_df$identical), "truly identical -- would indicate a dedup miss upstream )\n")
+  write.csv(high_cor_df, here(cfg$paths$tables_dir, "step13_final_candidates_correlation_recheck.csv"), row.names = FALSE)
+  stopifnot(all(!high_cor_df$identical))
+}
+
 write.csv(triple_candidates_clean, here(cfg$paths$tables_dir, "step13_triple_candidates.csv"), row.names = FALSE)
 saveRDS(triple_candidates_clean, here(cfg$paths$checkpoints_dir, "triple_candidates.rds"))
 cat("Checkpoint written: triple_candidates.rds\n")
