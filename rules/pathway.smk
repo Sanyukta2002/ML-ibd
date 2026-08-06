@@ -81,3 +81,19 @@ rule pathway_maaslin2_tier_overlap:
     container: "envs/bioconductor.sif"
     resources: mem_mb = 2000, runtime = 10
     shell: "Rscript scripts/r/17_pathway_maaslin2_tier_overlap.R > {log} 2>&1"
+
+rule pathway_wilcoxon:
+    input:
+        pooled = f"{config['paths']['checkpoints_dir']}/pooled_data_pathway_final.rds",
+        final_pathways = f"{config['paths']['checkpoints_dir']}/final_pathways.rds",
+        fit_tier1 = f"{config['paths']['checkpoints_dir']}/fit_tier1_pathway.rds",
+        config = "config/config.yaml"
+    output:
+        checkpoint = f"{config['paths']['checkpoints_dir']}/blocked_wilcox_df_pathway.rds",
+        name_map = f"{config['paths']['checkpoints_dir']}/name_map_pathway.rds",
+        hit_summary = f"{config['paths']['tables_dir']}/step_pathway_wilcoxon_hit_summary.csv",
+        full_results = f"{config['paths']['tables_dir']}/step_pathway_wilcoxon_full_results.csv"
+    log: "logs/pathway_wilcoxon.log"
+    container: "envs/bioconductor.sif"
+    resources: mem_mb = 4000, runtime = 20
+    shell: "Rscript scripts/r/18_pathway_wilcoxon.R > {log} 2>&1"
