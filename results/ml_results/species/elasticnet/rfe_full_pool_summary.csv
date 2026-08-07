@@ -1,0 +1,2 @@
+run_name,model,panel,n_features,auroc_mean,auroc_std,auprc_mean
+species_elasticnet_rfe_full_pool,elasticnet,rfe_full_pool,19,0.8305325626754196,0.0038413751587628047,0.886655407747614

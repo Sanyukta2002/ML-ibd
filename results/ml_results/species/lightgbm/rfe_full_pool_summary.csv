@@ -1,0 +1,2 @@
+run_name,model,panel,n_features,auroc_mean,auroc_std,auprc_mean
+species_lightgbm_rfe_full_pool,lightgbm,rfe_full_pool,19,0.8244983587840731,0.01041664342318493,0.8773459187398066

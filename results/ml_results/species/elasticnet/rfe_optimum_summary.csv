@@ -1,0 +1,2 @@
+run_name,model,panel,n_features,auroc_mean,auroc_std,auprc_mean
+species_elasticnet_rfe_optimum,elasticnet,rfe_optimum,17,0.8324570667427811,0.0039420568424130475,0.8878621459165185

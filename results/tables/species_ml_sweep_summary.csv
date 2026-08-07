@@ -1,0 +1,13 @@
+run_name,model,panel,n_features,auroc_mean,auroc_std,auprc_mean
+species_elasticnet_rfe_optimum,elasticnet,rfe_optimum,17,0.8324570667427811,0.003942056842413,0.8878621459165185
+species_elasticnet_rfe_full_pool,elasticnet,rfe_full_pool,19,0.8305325626754196,0.0038413751587628,0.886655407747614
+species_elasticnet_rfe_parsimony,elasticnet,rfe_parsimony,12,0.8292607392607392,0.0060657224671626,0.8879390857706874
+species_lightgbm_rfe_full_pool,lightgbm,rfe_full_pool,19,0.8244983587840731,0.0104166434231849,0.8773459187398066
+species_lightgbm_rfe_optimum,lightgbm,rfe_optimum,17,0.8218900147471576,0.0088642043951301,0.8759560530973933
+species_xgboost_rfe_parsimony,xgboost,rfe_parsimony,12,0.8215558251272537,0.0093969174887288,0.8795659285564238
+species_xgboost_rfe_full_pool,xgboost,rfe_full_pool,19,0.82145806574378,0.0049744370717235,0.8759060230729577
+species_xgboost_rfe_optimum,xgboost,rfe_optimum,17,0.8204621568907283,0.0023642991637544,0.8752261142222908
+species_lightgbm_rfe_parsimony,lightgbm,rfe_parsimony,12,0.8191171923314782,0.0044556699314186,0.8764496135363199
+species_random_forest_rfe_parsimony,random_forest,rfe_parsimony,12,0.8189453403739118,0.0055279545064992,0.8762380090222788
+species_random_forest_rfe_full_pool,random_forest,rfe_full_pool,19,0.8184201512772941,0.0070754234569634,0.8724124801417764
+species_random_forest_rfe_optimum,random_forest,rfe_optimum,17,0.8173735788021501,0.0057764691841859,0.8719987978874719

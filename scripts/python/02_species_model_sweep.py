@@ -4,6 +4,7 @@
 # its own output file (resume: Snakemake only reruns missing combos).
 
 import argparse
+import os
 import warnings
 from pathlib import Path
 
@@ -61,8 +62,24 @@ existing = mlflow.search_runs(
 )
 if len(existing) > 0 and not args.smoke_test:
     print(f"Run '{run_name}' already completed in MLflow (run_id={existing.iloc[0]['run_id']}) -- skipping.")
+    row = existing.iloc[0]
+    # regenerate the summary CSV too, not just the .done marker -- a real gap
+    # found in practice: the resume-skip path used to only touch .done, leaving
+    # _summary.csv missing (aggregation later fails loudly on this, by design)
+    summary_row = pd.DataFrame([{
+        "run_name": run_name, "model": args.model, "panel": args.panel,
+        "n_features": len(panel_features),
+        "auroc_mean": row.get("metrics.auroc_mean"), "auroc_std": row.get("metrics.auroc_std"),
+        "auprc_mean": row.get("metrics.auprc_mean"),
+    }])
+    summary_row.to_csv(results_dir / f"{args.panel}_summary.csv", index=False)
     Path(results_dir / f"{args.panel}.done").touch()
-    sys.exit(0)
+    sys.stdout.flush()
+    os._exit(0)  # bypass Python's normal shutdown/atexit machinery entirely --
+                  # sys.exit(0) was observed returning exit code 1 anyway (likely
+                  # an atexit hook, possibly from mlflow's HTTP client, raising
+                  # during interpreter teardown and overriding the requested code).
+                  # Nothing left to clean up at this point, safe to hard-exit.
 
 n_repeats = 1 if args.smoke_test else cfg["nested_cv"]["n_repeats"]
 n_splits = 3 if args.smoke_test else cfg["nested_cv"]["n_splits"]

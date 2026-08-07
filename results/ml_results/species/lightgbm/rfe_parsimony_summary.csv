@@ -1,0 +1,2 @@
+run_name,model,panel,n_features,auroc_mean,auroc_std,auprc_mean
+species_lightgbm_rfe_parsimony,lightgbm,rfe_parsimony,12,0.8191171923314782,0.004455669931418662,0.8764496135363199

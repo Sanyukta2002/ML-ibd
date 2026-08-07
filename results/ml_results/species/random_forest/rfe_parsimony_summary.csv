@@ -1,0 +1,2 @@
+run_name,model,panel,n_features,auroc_mean,auroc_std,auprc_mean
+species_random_forest_rfe_parsimony,random_forest,rfe_parsimony,12,0.8189453403739118,0.005527954506499275,0.8762380090222788

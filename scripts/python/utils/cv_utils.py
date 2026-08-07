@@ -11,6 +11,11 @@ import time
 import tempfile
 import warnings
 
+# Respect whatever SLURM actually allocated for this job's CPUs --
+# never request more than granted. Falls back to 4 for interactive/
+# non-SLURM use (e.g. manual testing on a login node).
+N_JOBS = int(os.environ.get("SLURM_CPUS_PER_TASK", 4))
+
 import numpy as np
 import pandas as pd
 import optuna
@@ -132,7 +137,7 @@ def get_model_for_trial(trial_or_params, model_name):
             min_samples_split=suggest("min_samples_split", "int", 2, 20),
             min_samples_leaf=suggest("min_samples_leaf", "int", 1, 10),
             max_features=suggest("max_features", "categorical", ["sqrt", "log2", None]),
-            random_state=123, n_jobs=-1,
+            random_state=123, n_jobs=N_JOBS,
         )
 
     elif model_name == "xgboost":
@@ -145,7 +150,7 @@ def get_model_for_trial(trial_or_params, model_name):
             colsample_bytree=suggest("colsample_bytree", "float", 0.5, 1.0),
             reg_alpha=suggest("reg_alpha", "float", 1e-8, 10.0, log=True),
             reg_lambda=suggest("reg_lambda", "float", 1e-8, 10.0, log=True),
-            random_state=123, eval_metric="logloss", n_jobs=-1,
+            random_state=123, eval_metric="logloss", n_jobs=N_JOBS,
         )
 
     elif model_name == "lightgbm":
@@ -159,7 +164,7 @@ def get_model_for_trial(trial_or_params, model_name):
             colsample_bytree=suggest("colsample_bytree", "float", 0.5, 1.0),
             reg_alpha=suggest("reg_alpha", "float", 1e-8, 10.0, log=True),
             reg_lambda=suggest("reg_lambda", "float", 1e-8, 10.0, log=True),
-            random_state=123, n_jobs=-1, verbose=-1,
+            random_state=123, n_jobs=N_JOBS, verbose=-1,
         )
 
     elif model_name == "elasticnet":

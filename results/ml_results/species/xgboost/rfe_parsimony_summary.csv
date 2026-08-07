@@ -1,0 +1,2 @@
+run_name,model,panel,n_features,auroc_mean,auroc_std,auprc_mean
+species_xgboost_rfe_parsimony,xgboost,rfe_parsimony,12,0.8215558251272537,0.00939691748872888,0.8795659285564238

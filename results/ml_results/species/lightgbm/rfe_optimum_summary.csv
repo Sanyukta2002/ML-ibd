@@ -1,0 +1,2 @@
+run_name,model,panel,n_features,auroc_mean,auroc_std,auprc_mean
+species_lightgbm_rfe_optimum,lightgbm,rfe_optimum,17,0.8218900147471576,0.008864204395130183,0.8759560530973933

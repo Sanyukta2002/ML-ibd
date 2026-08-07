@@ -28,8 +28,8 @@ rule species_model_sweep:
                               # padded for other models, which may differ; revisit after full batch
     shell:
         "SLURM_CPUS_PER_TASK={resources.cpus_per_task} "
-        "mamba run -p /N/project/BacInteraction/schapag_cowrumen/ibd_crosscohort/envs/python_ml "
-        "python scripts/python/02_species_model_sweep.py --model {wildcards.model} --panel {wildcards.panel} "
+        "/N/project/BacInteraction/schapag_cowrumen/ibd_crosscohort/envs/python_ml/bin/python "
+        "scripts/python/02_species_model_sweep.py --model {wildcards.model} --panel {wildcards.panel} "
         "> {log} 2>&1"
 
 rule species_model_sweep_all:
