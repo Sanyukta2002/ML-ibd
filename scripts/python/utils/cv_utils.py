@@ -284,4 +284,16 @@ def run_nested_cv_optuna(X, y, model_name, n_repeats=5, n_splits=10,
                 fold_results_df[["fold_num", "y_true", "y_proba"]].to_csv(preds_path, index=False)
                 mlflow.log_artifact(preds_path, artifact_path="predictions")
 
+                # Per-repeat metrics (one row per CV repeat, all 7 metrics) --
+                # previously computed only in-memory to derive the mean/std,
+                # then discarded. Gap found when reviewing species' results:
+                # this is what a fold/repeat-spread figure (boxplot-style,
+                # matching the reference papers) actually needs -- the
+                # aggregate mean/std alone isn't enough to redraw that.
+                # Species sweep does NOT have this (ran before the gap was
+                # found) -- pathway/combined do, from this point forward.
+                per_repeat_path = os.path.join(tmp_dir, "per_repeat_metrics.csv")
+                per_repeat_metrics.to_csv(per_repeat_path, index=False)
+                mlflow.log_artifact(per_repeat_path, artifact_path="per_repeat_metrics")
+
     return per_repeat_metrics, fold_results_df, best_params_per_fold
