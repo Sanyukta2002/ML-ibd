@@ -1,0 +1,13 @@
+run_name,model,panel,n_features,auroc_mean,auroc_std,auprc_mean
+pathway_elasticnet_rfe_full_pool,elasticnet,rfe_full_pool,18,0.6916219494790923,0.0136624904361686,0.7873955591449391
+pathway_elasticnet_rfe_parsimony,elasticnet,rfe_parsimony,9,0.667154750011893,0.0140327228146081,0.7746776111642928
+pathway_elasticnet_rfe_optimum,elasticnet,rfe_optimum,12,0.664445078730793,0.0059420080689783,0.7731526480793605
+pathway_lightgbm_rfe_full_pool,lightgbm,rfe_full_pool,18,0.6594681508967224,0.0091996274536083,0.7656536052833692
+pathway_xgboost_rfe_full_pool,xgboost,rfe_full_pool,18,0.6564223871366728,0.0099440687915482,0.7674044357333212
+pathway_random_forest_rfe_full_pool,random_forest,rfe_full_pool,18,0.6488073830930974,0.0044956243979369,0.7544323354500349
+pathway_random_forest_rfe_optimum,random_forest,rfe_optimum,12,0.6261731126016841,0.0143365774251654,0.7446830454797753
+pathway_random_forest_rfe_parsimony,random_forest,rfe_parsimony,9,0.6255463584035013,0.0186231171150419,0.7519685041938863
+pathway_xgboost_rfe_optimum,xgboost,rfe_optimum,12,0.6236342229199372,0.0134549664280144,0.7416393374345625
+pathway_xgboost_rfe_parsimony,xgboost,rfe_parsimony,9,0.6228975786118643,0.018383813179752,0.747229099541447
+pathway_lightgbm_rfe_parsimony,lightgbm,rfe_parsimony,9,0.6189674611103182,0.0300912481779682,0.7457431786864258
+pathway_lightgbm_rfe_optimum,lightgbm,rfe_optimum,12,0.6142607392607393,0.0144599379822444,0.7338380906640489

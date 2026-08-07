@@ -1,0 +1,2 @@
+run_name,model,panel,n_features,auroc_mean,auroc_std,auprc_mean
+pathway_xgboost_rfe_optimum,xgboost,rfe_optimum,12,0.6236342229199372,0.01345496642801447,0.7416393374345625

@@ -1,0 +1,2 @@
+run_name,model,panel,n_features,auroc_mean,auroc_std,auprc_mean
+pathway_random_forest_rfe_optimum,random_forest,rfe_optimum,12,0.6261731126016841,0.0143365774251654,0.7446830454797753

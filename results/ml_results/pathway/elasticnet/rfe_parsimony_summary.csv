@@ -1,0 +1,2 @@
+run_name,model,panel,n_features,auroc_mean,auroc_std,auprc_mean
+pathway_elasticnet_rfe_parsimony,elasticnet,rfe_parsimony,9,0.667154750011893,0.01403272281460819,0.7746776111642928
