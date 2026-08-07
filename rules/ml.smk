@@ -28,7 +28,7 @@ rule species_model_sweep:
                               # padded for other models, which may differ; revisit after full batch
     shell:
         "SLURM_CPUS_PER_TASK={resources.cpus_per_task} "
-        "/N/project/BacInteraction/schapag_cowrumen/ibd_crosscohort/envs/python_ml/bin/python "
+        "PYTHONUNBUFFERED=1 PYTHONWARNINGS=ignore /N/project/BacInteraction/schapag_cowrumen/ibd_crosscohort/envs/python_ml/bin/python "
         "scripts/python/02_species_model_sweep.py --model {wildcards.model} --panel {wildcards.panel} "
         "> {log} 2>&1"
 
@@ -36,3 +36,36 @@ rule species_model_sweep_all:
     input:
         expand("results/ml_results/species/{model}/{panel}.done",
                model=SPECIES_MODELS, panel=SPECIES_PANELS)
+
+# ============================================================
+# Pathway-only model sweep (Phase 2). Same structure as species,
+# fixes already baked in.
+# ============================================================
+
+PATHWAY_MODELS = ["random_forest", "xgboost", "lightgbm", "elasticnet"]
+PATHWAY_PANELS = ["rfe_optimum", "rfe_parsimony", "rfe_full_pool"]
+
+rule pathway_model_sweep:
+    input:
+        pathway_csv = f"{config['paths']['python_export_dir']}/pathway_full_filtered.csv",
+        membership = f"{config['paths']['python_export_dir']}/pathway_panel_membership.csv",
+        config = "config/config.yaml"
+    output:
+        done = "results/ml_results/pathway/{model}/{panel}.done",
+        summary = "results/ml_results/pathway/{model}/{panel}_summary.csv"
+    log:
+        "logs/ml_pathway_{model}_{panel}.log"
+    resources:
+        mem_mb = 2000,
+        cpus_per_task = 4,
+        runtime = 120
+    shell:
+        "SLURM_CPUS_PER_TASK={resources.cpus_per_task} "
+        "PYTHONUNBUFFERED=1 PYTHONWARNINGS=ignore /N/project/BacInteraction/schapag_cowrumen/ibd_crosscohort/envs/python_ml/bin/python "
+        "scripts/python/03_pathway_model_sweep.py --model {wildcards.model} --panel {wildcards.panel} "
+        "> {log} 2>&1"
+
+rule pathway_model_sweep_all:
+    input:
+        expand("results/ml_results/pathway/{model}/{panel}.done",
+               model=PATHWAY_MODELS, panel=PATHWAY_PANELS)
