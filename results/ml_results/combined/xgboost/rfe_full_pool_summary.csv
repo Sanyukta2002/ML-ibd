@@ -1,0 +1,2 @@
+run_name,model,panel,n_features,auroc_mean,auroc_std,auprc_mean
+combined_xgboost_rfe_full_pool,xgboost,rfe_full_pool,37,0.8164811379097093,0.011931877803821378,0.8730258241913221

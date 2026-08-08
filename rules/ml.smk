@@ -69,3 +69,39 @@ rule pathway_model_sweep_all:
     input:
         expand("results/ml_results/pathway/{model}/{panel}.done",
                model=PATHWAY_MODELS, panel=PATHWAY_PANELS)
+
+# ============================================================
+# Combined species+pathway sweep (Phase 3). Fixed at each
+# modality's rfe_full_pool panel (each modality's actual best
+# performer, per the completed standalone sweeps) -- 37 features
+# total. All 4 models, deliberately not assuming ElasticNet wins
+# again with a different feature-space structure.
+# ============================================================
+
+COMBINED_MODELS = ["random_forest", "xgboost", "lightgbm", "elasticnet"]
+
+rule combined_model_sweep:
+    input:
+        species_csv = f"{config['paths']['python_export_dir']}/species_full_filtered.csv",
+        pathway_csv = f"{config['paths']['python_export_dir']}/pathway_full_filtered.csv",
+        species_membership = f"{config['paths']['python_export_dir']}/species_panel_membership.csv",
+        pathway_membership = f"{config['paths']['python_export_dir']}/pathway_panel_membership.csv",
+        config = "config/config.yaml"
+    output:
+        done = "results/ml_results/combined/{model}/rfe_full_pool.done",
+        summary = "results/ml_results/combined/{model}/rfe_full_pool_summary.csv"
+    log:
+        "logs/ml_combined_{model}.log"
+    resources:
+        mem_mb = 2000,
+        cpus_per_task = 4,
+        runtime = 150   # 37 features vs species' max 19 -- padding above species' RF ceiling (~100min)
+    shell:
+        "SLURM_CPUS_PER_TASK={resources.cpus_per_task} PYTHONUNBUFFERED=1 PYTHONWARNINGS=ignore "
+        "/N/project/BacInteraction/schapag_cowrumen/ibd_crosscohort/envs/python_ml/bin/python "
+        "scripts/python/04_combined_model_sweep.py --model {wildcards.model} "
+        "> {log} 2>&1"
+
+rule combined_model_sweep_all:
+    input:
+        expand("results/ml_results/combined/{model}/rfe_full_pool.done", model=COMBINED_MODELS)

@@ -1,0 +1,5 @@
+run_name,model,panel,n_features,auroc_mean,auroc_std,auprc_mean
+combined_elasticnet_rfe_full_pool,elasticnet,rfe_full_pool,37,0.8312720612720612,0.0049838251078101,0.8884632482472122
+combined_xgboost_rfe_full_pool,xgboost,rfe_full_pool,37,0.8164811379097093,0.0119318778038213,0.8730258241913221
+combined_random_forest_rfe_full_pool,random_forest,rfe_full_pool,37,0.8126276104847532,0.0071341025886009,0.8658981888823934
+combined_lightgbm_rfe_full_pool,lightgbm,rfe_full_pool,37,0.810913134484563,0.0085511227946916,0.8679217334896834

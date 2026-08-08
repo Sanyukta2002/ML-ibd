@@ -1,0 +1,2 @@
+run_name,model,panel,n_features,auroc_mean,auroc_std,auprc_mean
+combined_random_forest_rfe_full_pool,random_forest,rfe_full_pool,37,0.8126276104847532,0.007134102588600962,0.8658981888823934
