@@ -105,3 +105,36 @@ rule combined_model_sweep:
 rule combined_model_sweep_all:
     input:
         expand("results/ml_results/combined/{model}/rfe_full_pool.done", model=COMBINED_MODELS)
+
+# ============================================================
+# LOCO (leave-one-cohort-out) validation (Phase 4). Tests the
+# 3 winning ElasticNet configs against genuine cross-cohort
+# generalization -- directly stress-tests the PERMANOVA finding
+# that cohort explains far more variance (R^2~0.13) than IBD
+# status (R^2~0.01), which pooled nested-CV can't rule out.
+# ============================================================
+
+LOCO_FEATURE_TYPES = ["species", "pathway", "combined"]
+
+rule loco_validation:
+    input:
+        species_csv = f"{config['paths']['python_export_dir']}/species_full_filtered.csv",
+        pathway_csv = f"{config['paths']['python_export_dir']}/pathway_full_filtered.csv",
+        config = "config/config.yaml"
+    output:
+        summary = "results/loco/{feature_type}/loco_summary.csv"
+    log:
+        "logs/loco_{feature_type}.log"
+    resources:
+        mem_mb = 2000,
+        cpus_per_task = 4,
+        runtime = 30
+    shell:
+        "SLURM_CPUS_PER_TASK={resources.cpus_per_task} PYTHONUNBUFFERED=1 PYTHONWARNINGS=ignore "
+        "/N/project/BacInteraction/schapag_cowrumen/ibd_crosscohort/envs/python_ml/bin/python "
+        "scripts/python/06_loco_validation.py --feature-type {wildcards.feature_type} "
+        "> {log} 2>&1"
+
+rule loco_validation_all:
+    input:
+        expand("results/loco/{feature_type}/loco_summary.csv", feature_type=LOCO_FEATURE_TYPES)
