@@ -117,6 +117,15 @@ mean_abs_shap = pd.DataFrame({
 mean_abs_shap["feature_type"] = mean_abs_shap["feature"].apply(lambda x: "species" if x.startswith("species__") else "pathway")
 mean_abs_shap.to_csv(tables_dir / "combined_shap_importance.csv", index=False)
 
+# Save the raw SHAP values + underlying feature matrix too -- separates
+# COMPUTING shap values (needs the model/data/HPC environment) from
+# RENDERING figures (purely visual, can happen anywhere later, including
+# locally, without rerunning anything). Beeswarm plot layout is a known
+# SHAP+matplotlib rendering gotcha not worth chasing further here --
+# deferred to the dedicated figures phase per project decision.
+np.save(tables_dir / "combined_shap_values_raw.npy", shap_values)
+X_scaled.to_csv(tables_dir / "combined_shap_input_features.csv", index=False)
+
 # ---- The actual question: species vs pathway total contribution ----
 contribution_by_type = mean_abs_shap.groupby("feature_type")["mean_abs_shap"].sum()
 contribution_pct = (contribution_by_type / contribution_by_type.sum() * 100).round(1)
@@ -147,10 +156,12 @@ plt.tight_layout()
 plt.savefig(figures_dir / "combined_shap_top20.png", dpi=300)
 plt.savefig(figures_dir / "combined_shap_top20.pdf")
 plt.close()
-
-shap.summary_plot(shap_values, X_scaled, show=False)
+X_scaled_display = X_scaled.copy()
+X_scaled_display.columns = [c.replace("species__", "").replace("pathway__", "") for c in X_scaled_display.columns]
+plt.figure(figsize=(10, 12))
+shap.summary_plot(shap_values, X_scaled_display, show=False)
 plt.tight_layout()
-plt.savefig(figures_dir / "combined_shap_beeswarm.png", dpi=300)
+plt.savefig(figures_dir / "combined_shap_beeswarm.png", dpi=300, bbox_inches="tight")
 plt.close()
 
 mlflow.log_params(study.best_params)

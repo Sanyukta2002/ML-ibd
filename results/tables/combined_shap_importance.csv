@@ -1,0 +1,38 @@
+feature,mean_abs_shap,feature_type
+species__Adlercreutzia equolifaciens,0.34107099777393457,species
+species__Gemmiger formicilis,0.3396405008416585,species
+species__Ruminococcus bromii,0.30316811448852204,species
+species__[Ruminococcus] torques,0.19187612834102685,species
+species__Alistipes putredinis,0.15844289901257397,species
+species__[Clostridium] leptum,0.1431338716821634,species
+pathway__PWY0-162: superpathway of pyrimidine ribonucleotides de novo biosynthesis,0.11467932431879048,pathway
+species__Fusicatenibacter saccharivorans,0.09980388087840558,species
+species__Erysipelatoclostridium ramosum,0.09957407487575617,species
+species__Anaerobutyricum hallii,0.08452037486444573,species
+pathway__PWY-7187: pyrimidine deoxyribonucleotides de novo biosynthesis II,0.07260204637991634,pathway
+species__Ruminococcus bicirculans,0.07246645112068596,species
+species__Eubacterium ventriosum,0.07120403819806707,species
+species__[Eubacterium] rectale,0.06383479167303543,species
+species__[Clostridium] symbiosum,0.02586049742934052,species
+"pathway__PWY-724: superpathway of L-lysine, L-threonine and L-methionine biosynthesis II",0.02487799451718732,pathway
+pathway__PWY-6703: preQ0 biosynthesis,0.022582615263931207,pathway
+species__Turicibacter sanguinis,0.015266120341513013,species
+species__Roseburia inulinivorans,0.014793798604637903,species
+pathway__PWY-3841: folate transformations II,0.013717470360366423,pathway
+pathway__HISTSYN-PWY: L-histidine biosynthesis,0.008074583167795616,pathway
+pathway__COA-PWY-1: coenzyme A biosynthesis II (mammalian),0.005521039603245456,pathway
+pathway__TRPSYN-PWY: L-tryptophan biosynthesis,0.003783244397140842,pathway
+pathway__PWY-6163: chorismate biosynthesis from 3-dehydroquinate,0.0032365165180941995,pathway
+species__Eubacterium sp. CAG:274,0.0028656671907416843,species
+species__Clostridium sp. CAG:167,0.0,species
+pathway__TRNA-CHARGING-PWY: tRNA charging,0.0,pathway
+species__[Ruminococcus] lactaris,0.0,species
+species__Coprococcus catus,0.0,species
+pathway__PWY-5097: L-lysine biosynthesis VI,0.0,pathway
+pathway__ARO-PWY: chorismate biosynthesis I,0.0,pathway
+pathway__COMPLETE-ARO-PWY: superpathway of aromatic amino acid biosynthesis,0.0,pathway
+pathway__PWY-6121: 5-aminoimidazole ribonucleotide biosynthesis I,0.0,pathway
+pathway__PWY-6737: starch degradation V,0.0,pathway
+pathway__PWY-6386: UDP-N-acetylmuramoyl-pentapeptide biosynthesis II (lysine-containing),0.0,pathway
+pathway__PWY-5686: UMP biosynthesis,0.0,pathway
+pathway__PWY-6122: 5-aminoimidazole ribonucleotide biosynthesis II,0.0,pathway
