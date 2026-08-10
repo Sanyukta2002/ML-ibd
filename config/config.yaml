@@ -86,6 +86,8 @@ nested_cv:
     - lightgbm
     - elasticnet
 
+python_env_path: "envs/python_ml"   # relative to repo root -- portable across clones
+
 mlflow:
   experiment_name: "ibd-crosscohort"
   tracking_host: "h2.quartz.uits.iu.edu"   # login node running the tracking server
