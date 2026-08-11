@@ -9,6 +9,7 @@ library(yaml)
 library(Maaslin2)
 
 cfg <- yaml::read_yaml(here("config", "config.yaml"))
+dir.create(here(cfg$paths$maaslin2_dir), recursive = TRUE, showWarnings = FALSE)
 
 pooled_data_filtered <- readRDS(here(cfg$paths$checkpoints_dir, "pooled_data_filtered.rds"))
 final_species <- readRDS(here(cfg$paths$checkpoints_dir, "final_species.rds"))
