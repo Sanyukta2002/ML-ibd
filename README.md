@@ -27,19 +27,48 @@ Full results, all figures, and methodological detail: https://sanyukta2002.githu
 
 ## Reproducibility
 
-The full pipeline was independently verified via a clean-room test: a fresh clone, both environments rebuilt entirely from tracked recipe files with no manual intervention, and the complete pipeline run unattended end-to-end -- output compared byte-for-byte against the original run and found identical. Full verification details: REPRODUCIBILITY.md.
+The full pipeline was independently verified via a clean-room test: a fresh clone, both environments rebuilt entirely from tracked recipe files with no manual intervention, and the complete pipeline run unattended end-to-end -- output compared byte-for-byte against the original run and found identical. Full verification details: [REPRODUCIBILITY.md](REPRODUCIBILITY.md).
 
 ### Reproducing this pipeline
 
-1. **Clone this repository.**
-2. **Build the R environment** -- pull the Apptainer container defined in envs/r_bioconductor.def, then run scripts/r/setup/install_r_packages.R inside it to install the R/Bioconductor package set.
-3. **Build the Python environment** (exact pinned versions):
-   mamba env create -p envs/python_ml -f envs/python_ml.yml
-4. **Edit config/slurm_profile/config.yaml** -- the one file that legitimately needs a manual, site-specific edit (your own SLURM account, partition, and container bind paths). Every other path in the codebase is relative/config-driven and requires no editing.
-5. **Start the MLflow tracking server:**
-   bash scripts/start_mlflow_server.sh
-6. **Run the full pipeline** (raw cohort pull through combined ML sweeps and LOCO validation, unattended):
-   snakemake --workflow-profile config/slurm_profile
+**Prerequisites:** access to an HPC cluster with SLURM, Apptainer/Singularity, and conda/mamba.
+
+**1. Clone this repository:**
+
+```bash
+git clone https://github.com/Sanyukta2002/ML-ibd.git
+cd ML-ibd
+```
+
+**2. Build the R environment** — pull the Apptainer container, then install the R/Bioconductor package set inside it:
+
+```bash
+apptainer pull envs/bioconductor.sif docker://bioconductor/bioconductor_docker:RELEASE_3_19
+
+mkdir -p envs/r_libs
+apptainer exec --bind $(pwd):/proj --env R_LIBS_USER=/proj/envs/r_libs \
+  envs/bioconductor.sif Rscript /proj/scripts/r/setup/install_r_packages.R
+```
+
+**3. Build the Python environment** (exact pinned versions):
+
+```bash
+mamba env create -p envs/python_ml -f envs/python_ml.yml
+```
+
+**4. Edit `config/slurm_profile/config.yaml`** — the one file that legitimately needs a manual, site-specific edit (your own SLURM account, partition, and container bind paths). Every other path in the codebase is relative/config-driven and requires no editing.
+
+**5. Start the MLflow tracking server:**
+
+```bash
+bash scripts/start_mlflow_server.sh
+```
+
+**6. Run the full pipeline** (raw cohort pull through combined ML sweeps and LOCO validation, unattended):
+
+```bash
+snakemake --workflow-profile config/slurm_profile
+```
 
 ## Repository Structure
 
