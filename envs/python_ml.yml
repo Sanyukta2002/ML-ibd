@@ -1,0 +1,30 @@
+# ============================================================
+# envs/python_ml.yml
+# Direct dependencies for the Python ML stage (species/pathway/
+# combined sweeps, LOCO, SHAP). Exact versions confirmed installed
+# and working as of 2026-08-10 (Python 3.11.15).
+#
+# This is the human-readable spec -- what the project actually
+# needs. For a full transitive-dependency lockfile (exact rebuild
+# on the same platform, RHEL8/x86_64), see
+# envs/python_ml_full_lockfile.yml.
+#
+# To rebuild:
+#   mamba env create -p envs/python_ml -f envs/python_ml.yml
+# ============================================================
+name: python_ml
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pandas=2.3.3
+  - numpy=2.4.6
+  - scikit-learn=1.9.0
+  - xgboost=3.2.0
+  - lightgbm=4.7.0
+  - optuna=4.9.0
+  - mlflow=3.15.1
+  - shap=0.51.0
+  - scipy=1.17.1
+  - graphviz
+  - python-graphviz

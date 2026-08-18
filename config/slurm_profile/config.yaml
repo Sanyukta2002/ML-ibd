@@ -1,3 +1,18 @@
+# ============================================================
+# SLURM execution profile -- SITE/ACCOUNT-SPECIFIC by design.
+# Unlike everything in rules/ and config/config.yaml (which are
+# fully portable across clones), this file legitimately needs a
+# one-time manual edit for a new deployment:
+#   - slurm_account: your own SLURM allocation (not a universal value)
+#   - slurm_partition: your cluster's partition name (may differ by site)
+#   - conda-prefix / singularity-args --bind / R_LIBS_USER: update the
+#     /N/project/.../ibd_crosscohort path to wherever you cloned this repo
+# This is expected, documented behavior, not a portability bug --
+# "reproducible" here means: given these values correctly set for
+# your own account/location, results are deterministic/verified
+# identical -- not that zero-edit universal portability is possible
+# for HPC-account-specific infrastructure.
+# ============================================================
 executor: slurm
 jobs: 20
 default-resources:
