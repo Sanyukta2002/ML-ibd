@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Methods – IBD Cross-Cohort Microbiome Classification</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-27e1aa2dab5d6404f55602c9c9ab0aa1.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    </a>
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">IBD Cross-Cohort Microbiome Classification</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Background</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./objectives.html"> 
+<span class="menu-text">Objectives</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./data-methods.html"> 
+<span class="menu-text">Data &amp; Cohort</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./methods.html" aria-current="page"> 
+<span class="menu-text">Methods</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./results.html"> 
+<span class="menu-text">Results</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#part-1-statistical-methods" id="toc-part-1-statistical-methods" class="nav-link active" data-scroll-target="#part-1-statistical-methods"><span class="header-section-number">1</span> Part 1 — Statistical methods</a>
+  <ul class="collapse">
+  <li><a href="#beta-diversity-permanova-on-bray-curtis-dissimilarity" id="toc-beta-diversity-permanova-on-bray-curtis-dissimilarity" class="nav-link" data-scroll-target="#beta-diversity-permanova-on-bray-curtis-dissimilarity"><span class="header-section-number">1.1</span> Beta diversity: PERMANOVA on Bray-Curtis dissimilarity</a></li>
+  <li><a href="#alpha-diversity-wilcoxon-rank-sum-cohort-adjusted-lme" id="toc-alpha-diversity-wilcoxon-rank-sum-cohort-adjusted-lme" class="nav-link" data-scroll-target="#alpha-diversity-wilcoxon-rank-sum-cohort-adjusted-lme"><span class="header-section-number">1.2</span> Alpha diversity: Wilcoxon rank-sum + cohort-adjusted LME</a></li>
+  <li><a href="#differential-abundance-tier-1-maaslin2-all-samples" id="toc-differential-abundance-tier-1-maaslin2-all-samples" class="nav-link" data-scroll-target="#differential-abundance-tier-1-maaslin2-all-samples"><span class="header-section-number">1.3</span> Differential abundance, Tier 1: MaAsLin2 (all samples)</a></li>
+  <li><a href="#differential-abundance-tier-2-maaslin2-age-adjusted-subset" id="toc-differential-abundance-tier-2-maaslin2-age-adjusted-subset" class="nav-link" data-scroll-target="#differential-abundance-tier-2-maaslin2-age-adjusted-subset"><span class="header-section-number">1.4</span> Differential abundance, Tier 2: MaAsLin2 (age-adjusted subset)</a></li>
+  <li><a href="#differential-abundance-blocked-wilcoxon-test" id="toc-differential-abundance-blocked-wilcoxon-test" class="nav-link" data-scroll-target="#differential-abundance-blocked-wilcoxon-test"><span class="header-section-number">1.5</span> Differential abundance, blocked Wilcoxon test</a></li>
+  <li><a href="#way-convergent-feature-selection-triple-candidates" id="toc-way-convergent-feature-selection-triple-candidates" class="nav-link" data-scroll-target="#way-convergent-feature-selection-triple-candidates"><span class="header-section-number">1.6</span> 3-way convergent feature selection (“triple-candidates”)</a></li>
+  </ul></li>
+  <li><a href="#part-2-feature-selection-recursive-feature-elimination-rfe" id="toc-part-2-feature-selection-recursive-feature-elimination-rfe" class="nav-link" data-scroll-target="#part-2-feature-selection-recursive-feature-elimination-rfe"><span class="header-section-number">2</span> Part 2 — Feature selection: Recursive Feature Elimination (RFE)</a></li>
+  <li><a href="#part-3-machine-learning" id="toc-part-3-machine-learning" class="nav-link" data-scroll-target="#part-3-machine-learning"><span class="header-section-number">3</span> Part 3 — Machine learning</a>
+  <ul class="collapse">
+  <li><a href="#feature-transform-centered-log-ratio-clr" id="toc-feature-transform-centered-log-ratio-clr" class="nav-link" data-scroll-target="#feature-transform-centered-log-ratio-clr"><span class="header-section-number">3.1</span> Feature transform: centered log-ratio (CLR)</a></li>
+  <li><a href="#nested-cross-validation-with-bayesian-hyperparameter-search" id="toc-nested-cross-validation-with-bayesian-hyperparameter-search" class="nav-link" data-scroll-target="#nested-cross-validation-with-bayesian-hyperparameter-search"><span class="header-section-number">3.2</span> Nested cross-validation with Bayesian hyperparameter search</a></li>
+  <li><a href="#model-families" id="toc-model-families" class="nav-link" data-scroll-target="#model-families"><span class="header-section-number">3.3</span> Model families</a></li>
+  <li><a href="#evaluation-metrics" id="toc-evaluation-metrics" class="nav-link" data-scroll-target="#evaluation-metrics"><span class="header-section-number">3.4</span> Evaluation metrics</a></li>
+  <li><a href="#leave-one-cohort-out-loco-validation" id="toc-leave-one-cohort-out-loco-validation" class="nav-link" data-scroll-target="#leave-one-cohort-out-loco-validation"><span class="header-section-number">3.5</span> Leave-one-cohort-out (LOCO) validation</a></li>
+  <li><a href="#model-interpretability-shap" id="toc-model-interpretability-shap" class="nav-link" data-scroll-target="#model-interpretability-shap"><span class="header-section-number">3.6</span> Model interpretability: SHAP</a></li>
+  <li><a href="#statistical-comparison-of-models" id="toc-statistical-comparison-of-models" class="nav-link" data-scroll-target="#statistical-comparison-of-models"><span class="header-section-number">3.7</span> Statistical comparison of models</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Methods</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Methods are presented in the order the pipeline actually runs them: exploratory/confounder characterization → differential abundance (three independent tests) → feature selection → machine learning. Code snippets are pulled verbatim (trimmed for length) from the actual scripts in <code>scripts/r/</code> and <code>scripts/python/</code> — not rewritten.</p>
+<section id="part-1-statistical-methods" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="part-1-statistical-methods"><span class="header-section-number">1</span> Part 1 — Statistical methods</h2>
+<section id="beta-diversity-permanova-on-bray-curtis-dissimilarity" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="beta-diversity-permanova-on-bray-curtis-dissimilarity"><span class="header-section-number">1.1</span> Beta diversity: PERMANOVA on Bray-Curtis dissimilarity</h3>
+<p>Before drawing any disease-association conclusion, the pipeline explicitly quantifies how much of the compositional variance is attributable to <strong>cohort of origin</strong> versus <strong>IBD status</strong>, using <code>vegan::adonis2</code> with marginal (<code>by = "margin"</code>) term testing so each term’s R² reflects its contribution after accounting for the other. A base model (<code>cohort + group</code>) is run on all samples, then three covariate-adjusted submodels (<code>+ age</code>, <code>+ gender</code>, <code>+ BMI</code>) are run on the subset of cohorts where that covariate is actually available.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>bray_dist <span class="ot">&lt;-</span> <span class="fu">vegdist</span>(abund_matrix, <span class="at">method =</span> <span class="st">"bray"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>permanova_basic <span class="ot">&lt;-</span> <span class="fu">adonis2</span>(bray_dist <span class="sc">~</span> cohort <span class="sc">+</span> group,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">data =</span> meta_for_permanova,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>                            <span class="at">permutations =</span> <span class="dv">999</span>, <span class="at">by =</span> <span class="st">"margin"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>run_covariate_permanova <span class="ot">&lt;-</span> <span class="cf">function</span>(covariate, cohorts_with_covariate) {</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  d <span class="ot">&lt;-</span> pooled_data <span class="sc">%&gt;%</span> <span class="fu">filter</span>(cohort <span class="sc">%in%</span> cohorts_with_covariate, <span class="sc">!</span><span class="fu">is.na</span>(.data[[covariate]]))</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  bray_sub <span class="ot">&lt;-</span> <span class="fu">vegdist</span>(<span class="fu">as.matrix</span>(d[, taxa_cols]), <span class="at">method =</span> <span class="st">"bray"</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  formula_str <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">"bray_sub ~ cohort + group +"</span>, covariate)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">adonis2</span>(<span class="fu">as.formula</span>(formula_str), <span class="at">data =</span> d[, meta_cols], <span class="at">permutations =</span> <span class="dv">999</span>, <span class="at">by =</span> <span class="st">"margin"</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Source: <code>scripts/r/04_diversity_permanova.R</code> (species) / <code>14_pathway_diversity_permanova.R</code> (pathway).</em></p>
+</section>
+<section id="alpha-diversity-wilcoxon-rank-sum-cohort-adjusted-lme" class="level3" data-number="1.2">
+<h3 data-number="1.2" class="anchored" data-anchor-id="alpha-diversity-wilcoxon-rank-sum-cohort-adjusted-lme"><span class="header-section-number">1.2</span> Alpha diversity: Wilcoxon rank-sum + cohort-adjusted LME</h3>
+<p>Alpha diversity (Shannon, Simpson, observed richness) is computed on the <strong>full raw abundance table</strong> (pre-filtering, deliberately — filtering thresholds are tuned for differential-abundance testing, not diversity estimation), then tested two ways: an unadjusted Wilcoxon rank-sum test (IBD vs.&nbsp;control, pooled), and a linear mixed-effects model with cohort as a random intercept (<code>nlme::lme</code>), to check whether the unadjusted result survives accounting for cohort clustering.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>shannon_idx <span class="ot">&lt;-</span> <span class="fu">diversity</span>(abund_matrix, <span class="at">index =</span> <span class="st">"shannon"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>wilcox_shannon <span class="ot">&lt;-</span> <span class="fu">wilcox.test</span>(shannon <span class="sc">~</span> group, <span class="at">data =</span> diversity_df)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>lme_shannon <span class="ot">&lt;-</span> <span class="fu">lme</span>(shannon <span class="sc">~</span> group, <span class="at">random =</span> <span class="sc">~</span><span class="dv">1</span><span class="sc">|</span>cohort, <span class="at">data =</span> diversity_df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Source: <code>scripts/r/04_diversity_permanova.R</code>, lines 82–117.</em></p>
+</section>
+<section id="differential-abundance-tier-1-maaslin2-all-samples" class="level3" data-number="1.3">
+<h3 data-number="1.3" class="anchored" data-anchor-id="differential-abundance-tier-1-maaslin2-all-samples"><span class="header-section-number">1.3</span> Differential abundance, Tier 1: MaAsLin2 (all samples)</h3>
+<p><a href="https://doi.org/10.1371/journal.pcbi.1009442">MaAsLin2</a> <span class="citation" data-cites="mallick2021maaslin2">(<a href="#ref-mallick2021maaslin2" role="doc-biblioref">Mallick et al. 2021</a>)</span> is run with <code>group</code> (control vs.&nbsp;IBD) as a fixed effect and <code>cohort</code> as a random effect, on the full sample set. TSS normalization, log transform, linear-model backend, BH FDR correction (<code>config.yaml: maaslin2</code>). <code>control</code> is explicitly releveled as the reference so a positive coefficient means <em>enriched in IBD</em>.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>input_metadata<span class="sc">$</span>group <span class="ot">&lt;-</span> <span class="fu">relevel</span>(<span class="fu">factor</span>(input_metadata<span class="sc">$</span>group), <span class="at">ref =</span> <span class="st">"control"</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>fit_tier1 <span class="ot">&lt;-</span> <span class="fu">Maaslin2</span>(</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">input_data      =</span> input_data,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">input_metadata  =</span> input_metadata,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">fixed_effects   =</span> <span class="fu">c</span>(<span class="st">"group"</span>),</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">random_effects  =</span> <span class="fu">c</span>(<span class="st">"cohort"</span>),</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">normalization   =</span> <span class="st">"TSS"</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">transform       =</span> <span class="st">"LOG"</span>,</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">analysis_method =</span> <span class="st">"LM"</span>,</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">correction      =</span> <span class="st">"BH"</span>,</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">standardize     =</span> <span class="cn">TRUE</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Source: <code>scripts/r/06_maaslin2_tier1.R</code>.</em></p>
+</section>
+<section id="differential-abundance-tier-2-maaslin2-age-adjusted-subset" class="level3" data-number="1.4">
+<h3 data-number="1.4" class="anchored" data-anchor-id="differential-abundance-tier-2-maaslin2-age-adjusted-subset"><span class="header-section-number">1.4</span> Differential abundance, Tier 2: MaAsLin2 (age-adjusted subset)</h3>
+<p>A robustness check on the subset of cohorts/subjects with non-missing age (<code>covariate_availability.rds</code>, derived empirically from the data rather than hardcoded — see the reproducibility caveat on the <a href="./data-methods.html">Data &amp; Cohort</a> page), adding <code>age</code> as a second fixed effect alongside <code>group</code>.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fit_tier2 <span class="ot">&lt;-</span> <span class="fu">Maaslin2</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">input_data      =</span> input_data_t2,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">input_metadata  =</span> input_metadata_t2,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">fixed_effects   =</span> <span class="fu">c</span>(<span class="st">"group"</span>, <span class="st">"age"</span>),</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">random_effects  =</span> <span class="fu">c</span>(<span class="st">"cohort"</span>),</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">normalization   =</span> <span class="st">"TSS"</span>, <span class="at">transform =</span> <span class="st">"LOG"</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">analysis_method =</span> <span class="st">"LM"</span>,  <span class="at">correction =</span> <span class="st">"BH"</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">standardize     =</span> <span class="cn">TRUE</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>tier2_group_results <span class="ot">&lt;-</span> fit_tier2<span class="sc">$</span>results <span class="sc">%&gt;%</span> <span class="fu">filter</span>(metadata <span class="sc">==</span> <span class="st">"group"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Source: <code>scripts/r/07_maaslin2_tier2_age.R</code>. Note: <code>plot_scatter=FALSE</code> is set in both tiers as a workaround for a MaAsLin2/ggplot2 version incompatibility in its continuous-covariate scatter-plot code (confirmed via log: model fit and <code>$results</code> extraction are unaffected).</em></p>
+</section>
+<section id="differential-abundance-blocked-wilcoxon-test" class="level3" data-number="1.5">
+<h3 data-number="1.5" class="anchored" data-anchor-id="differential-abundance-blocked-wilcoxon-test"><span class="header-section-number">1.5</span> Differential abundance, blocked Wilcoxon test</h3>
+<p>An independent, non-parametric test: a <strong>cohort-blocked</strong> Wilcoxon rank-sum test (<code>coin::wilcox_test</code>, block = cohort, conditional/permutation-based null distribution), run separately per feature. <code>coin</code>’s raw test statistic does not follow MaAsLin2’s “positive = enriched in IBD” sign convention, so the pipeline flips the sign and <strong>empirically verifies</strong> the correction against real group medians before trusting it (hard <code>stopifnot</code>, not just a comment):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>wt <span class="ot">&lt;-</span> coin<span class="sc">::</span><span class="fu">wilcox_test</span>(abundance <span class="sc">~</span> group <span class="sc">|</span> cohort, <span class="at">data =</span> df, <span class="at">distribution =</span> <span class="st">"asymptotic"</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>statistic_corrected <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">as.numeric</span>(coin<span class="sc">::</span><span class="fu">statistic</span>(wt))</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Empirical verification, not assumed:</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>ibd_higher <span class="ot">&lt;-</span> medians_check<span class="sc">$</span>median_abund[medians_check<span class="sc">$</span>group <span class="sc">==</span> <span class="st">"IBD"</span>] <span class="sc">&gt;</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>              medians_check<span class="sc">$</span>median_abund[medians_check<span class="sc">$</span>group <span class="sc">==</span> <span class="st">"control"</span>]</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>corrected_positive <span class="ot">&lt;-</span> corrected_stat <span class="sc">&gt;</span> <span class="dv">0</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(ibd_higher <span class="sc">==</span> corrected_positive)  <span class="co"># hard stop if the sign convention doesn't hold</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Source: <code>scripts/r/09_species_wilcoxon.R</code>. FDR correction: BH, same threshold (q &lt; 0.05) as MaAsLin2.</em></p>
+</section>
+<section id="way-convergent-feature-selection-triple-candidates" class="level3" data-number="1.6">
+<h3 data-number="1.6" class="anchored" data-anchor-id="way-convergent-feature-selection-triple-candidates"><span class="header-section-number">1.6</span> 3-way convergent feature selection (“triple-candidates”)</h3>
+<p>A feature is only trusted if <strong>all three</strong> tests agree: MaAsLin2 Tier 1 (q &lt; 0.05) ∩ MaAsLin2 Tier 2 (q &lt; 0.05) ∩ blocked Wilcoxon (q &lt; 0.05) — then a <strong>direction-agreement check</strong> (MaAsLin2 coefficient sign vs.&nbsp;corrected Wilcoxon statistic sign) — then a third, independent effect-size check using <strong>generalized fold change (gFC)</strong>, a quantile-based, non-parametric fold-change estimate robust to zero-inflation:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>compute_gfc <span class="ot">&lt;-</span> <span class="cf">function</span>(x, group, q_range) {</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  x_ibd <span class="ot">&lt;-</span> x[group <span class="sc">==</span> <span class="st">"IBD"</span>]; x_control <span class="ot">&lt;-</span> x[group <span class="sc">==</span> <span class="st">"control"</span>]</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  pc <span class="ot">&lt;-</span> <span class="fu">min</span>(x[x <span class="sc">&gt;</span> <span class="dv">0</span>], <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">/</span> <span class="dv">2</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  q_ibd     <span class="ot">&lt;-</span> <span class="fu">quantile</span>(<span class="fu">log10</span>(x_ibd <span class="sc">+</span> pc), <span class="at">probs =</span> q_range, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  q_control <span class="ot">&lt;-</span> <span class="fu">quantile</span>(<span class="fu">log10</span>(x_control <span class="sc">+</span> pc), <span class="at">probs =</span> q_range, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>(q_ibd <span class="sc">-</span> q_control)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co"># q_range: seq(0.1, 0.9, 0.05) -- config.yaml: gfc.quantile_range</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>triple_candidates<span class="sc">$</span>gfc_maaslin_agree <span class="ot">&lt;-</span> <span class="fu">sign</span>(triple_candidates<span class="sc">$</span>gFC) <span class="sc">==</span> <span class="fu">sign</span>(triple_candidates<span class="sc">$</span>coef_maaslin_tier1)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>triple_candidates<span class="sc">$</span>gfc_wilcox_agree  <span class="ot">&lt;-</span> <span class="fu">sign</span>(triple_candidates<span class="sc">$</span>gFC) <span class="sc">==</span> <span class="fu">sign</span>(triple_candidates<span class="sc">$</span>statistic_wilcox_corrected)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Only features passing the intersection, the direction check, <strong>and</strong> the gFC agreement check on both other tests survive as “triple-candidates.” <em>Source: <code>scripts/r/10_species_triple_candidates.R</code> (mirrored for pathway in <code>19_pathway_triple_candidates.R</code>).</em> Results: <strong>19 species</strong> and <strong>18 pathways</strong> survived this full pipeline (see <a href="./results.html">Results</a>).</p>
+</section>
+</section>
+<section id="part-2-feature-selection-recursive-feature-elimination-rfe" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="part-2-feature-selection-recursive-feature-elimination-rfe"><span class="header-section-number">2</span> Part 2 — Feature selection: Recursive Feature Elimination (RFE)</h2>
+<p>The triple-candidate pool (19 species / 18 pathways) is further reduced via <strong>Recursive Feature Elimination</strong> (<code>caret::rfe</code>), random-forest-based, AUC-optimized (<code>twoClassSummary</code>), 10-fold CV, producing a cross-validated AUROC-vs-panel-size curve. Three panels are derived from each curve:</p>
+<ul>
+<li><strong><code>rfe_optimum</code></strong> — the panel size with the single best cross-validated AUROC (<code>which.max(results_df$ROC)</code>)</li>
+<li><strong><code>rfe_parsimony</code></strong> — the smallest panel within 1% tolerance of the optimum (<code>caret::pickSizeTolerance(..., tol = 1)</code>)</li>
+<li><strong><code>rfe_full_pool</code></strong> — the entire triple-candidate pool, unranked, as an upper-bound reference</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>rfe_result <span class="ot">&lt;-</span> <span class="fu">rfe</span>(<span class="at">x =</span> feat_matrix, <span class="at">y =</span> y, <span class="at">sizes =</span> <span class="dv">2</span><span class="sc">:</span>n_candidates,</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">rfeControl =</span> ctrl_auc, <span class="at">metric =</span> <span class="st">"ROC"</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>optimum_size   <span class="ot">&lt;-</span> results_df<span class="sc">$</span>Variables[<span class="fu">which.max</span>(results_df<span class="sc">$</span>ROC)]</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>parsimony_size <span class="ot">&lt;-</span> caret<span class="sc">::</span><span class="fu">pickSizeTolerance</span>(results_df, <span class="at">metric =</span> <span class="st">"ROC"</span>, <span class="at">tol =</span> <span class="dv">1</span>, <span class="at">maximize =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Source: <code>scripts/r/11_species_rfe.R</code>, lines 68–97 (mirrored in <code>20_pathway_rfe.R</code>). Panel design explicitly credited to the RFE-to-a-compact-panel approach used in Ning et al.&nbsp;2023, Zheng et al.&nbsp;2024, and Zhou et al.&nbsp;2024 (script header comment).</em> Resulting panel sizes: species — 12 / 17 / 19; pathway — 9 / 12 / 18 (see <a href="./results.html">Results</a>).</p>
+</section>
+<section id="part-3-machine-learning" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="part-3-machine-learning"><span class="header-section-number">3</span> Part 3 — Machine learning</h2>
+<section id="feature-transform-centered-log-ratio-clr" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="feature-transform-centered-log-ratio-clr"><span class="header-section-number">3.1</span> Feature transform: centered log-ratio (CLR)</h3>
+<p>Before any modeling, the <strong>full filtered feature table</strong> (151 species or 118 pathways — not yet subset to an RFE panel) is CLR-transformed. This ordering matters: CLR is not sub-compositionally coherent, so computing it on a pre-cut panel would use the wrong geometric-mean reference; panel subsetting always happens <em>after</em> CLR, never before.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> clr_transform(df, pseudocount_method<span class="op">=</span><span class="st">"half_min_nonzero"</span>):</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    values <span class="op">=</span> df.values.astype(<span class="bu">float</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    pseudocount <span class="op">=</span> values[values <span class="op">&gt;</span> <span class="dv">0</span>].<span class="bu">min</span>() <span class="op">/</span> <span class="dv">2</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    log_vals <span class="op">=</span> np.log(values <span class="op">+</span> pseudocount)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    row_means <span class="op">=</span> log_vals.mean(axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    clr_vals <span class="op">=</span> log_vals <span class="op">-</span> row_means</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    clr_df <span class="op">=</span> pd.DataFrame(clr_vals, index<span class="op">=</span>df.index, columns<span class="op">=</span>df.columns)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> clr_df.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>).<span class="bu">abs</span>().<span class="bu">max</span>() <span class="op">&lt;</span> <span class="fl">1e-6</span>  <span class="co"># CLR rows must sum to ~0</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> clr_df, pseudocount</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Source: <code>scripts/python/utils/cv_utils.py</code>, lines 39–80.</em></p>
+</section>
+<section id="nested-cross-validation-with-bayesian-hyperparameter-search" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="nested-cross-validation-with-bayesian-hyperparameter-search"><span class="header-section-number">3.2</span> Nested cross-validation with Bayesian hyperparameter search</h3>
+<p>Every model/panel combination is evaluated with the same nested-CV engine: an <strong>outer loop</strong> of <code>RepeatedStratifiedKFold</code> (10 splits × 5 repeats = 50 outer folds, <code>random_state=123</code>) provides untouched held-out test folds; for each outer training fold, an <strong>inner</strong> Optuna study (TPE sampler, 5-fold <code>StratifiedKFold</code>, 30 trials, optimizing mean inner-fold ROC AUC) searches hyperparameters; the best inner configuration is refit on the full outer-training fold and evaluated once on its untouched outer-test fold.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>outer_cv <span class="op">=</span> RepeatedStratifiedKFold(n_splits<span class="op">=</span><span class="dv">10</span>, n_repeats<span class="op">=</span><span class="dv">5</span>, random_state<span class="op">=</span><span class="dv">123</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> fold_num, (train_idx, test_idx) <span class="kw">in</span> <span class="bu">enumerate</span>(outer_cv.split(X_arr, y_arr)):</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> objective(trial):</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>        model <span class="op">=</span> get_model_for_trial(trial, model_name)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>        inner_cv <span class="op">=</span> StratifiedKFold(n_splits<span class="op">=</span><span class="dv">5</span>, shuffle<span class="op">=</span><span class="va">True</span>, random_state<span class="op">=</span><span class="dv">123</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>        scores <span class="op">=</span> [roc_auc_score(y_train[val], model.fit(X_train[tr], y_train[tr]).predict_proba(X_train[val])[:, <span class="dv">1</span>])</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>                  <span class="cf">for</span> tr, val <span class="kw">in</span> inner_cv.split(X_train, y_train)]</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">float</span>(np.mean(scores))</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    study <span class="op">=</span> optuna.create_study(direction<span class="op">=</span><span class="st">"maximize"</span>, sampler<span class="op">=</span>optuna.samplers.TPESampler(seed<span class="op">=</span><span class="dv">123</span>))</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    study.optimize(objective, n_trials<span class="op">=</span><span class="dv">30</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    final_model <span class="op">=</span> get_model_for_trial(study.best_params, model_name).fit(X_train, y_train)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    y_proba <span class="op">=</span> final_model.predict_proba(X_test)[:, <span class="dv">1</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Per-repeat metrics are computed by averaging the 10 <strong>fold-level</strong> metrics within each repeat — never by pooling raw fold rows together, which would pseudo-replicate the confidence interval:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> aggregate_per_repeat(fold_results_df, n_splits):</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> fold_results_df.copy()</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">"repeat_id"</span>] <span class="op">=</span> df[<span class="st">"fold_num"</span>] <span class="op">//</span> n_splits</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    metric_cols <span class="op">=</span> [<span class="st">"auroc"</span>, <span class="st">"auprc"</span>, <span class="st">"sensitivity"</span>, <span class="st">"specificity"</span>, <span class="st">"precision"</span>, <span class="st">"f1"</span>, <span class="st">"accuracy"</span>]</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> df.groupby(<span class="st">"repeat_id"</span>)[metric_cols].mean().reset_index()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Source: <code>scripts/python/utils/cv_utils.py</code>, <code>run_nested_cv_optuna()</code> (lines 187–299) and <code>aggregate_per_repeat()</code> (lines 99–109).</em></p>
+</section>
+<section id="model-families" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="model-families"><span class="header-section-number">3.3</span> Model families</h3>
+<p>Four model families are evaluated on every feature panel, so the model choice is empirically justified rather than assumed — following the same “sweep several algorithms, don’t presuppose a winner” discipline used in Zhou et al.&nbsp;2024’s CRC/CRA screen:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Model</th>
+<th>Library</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Random Forest</td>
+<td>scikit-learn</td>
+<td>scale-invariant, bare estimator</td>
+</tr>
+<tr class="even">
+<td>XGBoost</td>
+<td>xgboost</td>
+<td>scale-invariant, bare estimator</td>
+</tr>
+<tr class="odd">
+<td>LightGBM</td>
+<td>lightgbm</td>
+<td>scale-invariant, bare estimator</td>
+</tr>
+<tr class="even">
+<td>ElasticNet-penalized Logistic Regression</td>
+<td>scikit-learn</td>
+<td>wrapped in <code>Pipeline(StandardScaler, LogisticRegression(penalty="elasticnet", solver="saga"))</code> — scaler is refit fresh inside every fold, so no leakage</td>
+</tr>
+</tbody>
+</table>
+<p>Sweep scope: species — 4 models × 3 panels = 12 runs; pathway — 4 models × 3 panels = 12 runs; combined (species + pathway concatenated post-CLR, <code>species__</code>/<code>pathway__</code> prefixed) — 4 models × 1 fixed panel (<code>rfe_full_pool</code>, 37 features) = 4 runs. 28 nested-CV runs total.</p>
+</section>
+<section id="evaluation-metrics" class="level3" data-number="3.4">
+<h3 data-number="3.4" class="anchored" data-anchor-id="evaluation-metrics"><span class="header-section-number">3.4</span> Evaluation metrics</h3>
+<p>AUROC and AUPRC are the primary metrics (via <code>roc_auc_score</code>/<code>average_precision_score</code> on held-out fold predictions); sensitivity, specificity, precision, F1, and accuracy are also logged per fold at a 0.5 probability threshold. All metrics, per-repeat values, and raw out-of-fold predictions (<code>y_true</code>/<code>y_proba</code>) are logged as MLflow artifacts for every run.</p>
+</section>
+<section id="leave-one-cohort-out-loco-validation" class="level3" data-number="3.5">
+<h3 data-number="3.5" class="anchored" data-anchor-id="leave-one-cohort-out-loco-validation"><span class="header-section-number">3.5</span> Leave-one-cohort-out (LOCO) validation</h3>
+<p>Pooled cross-validation cannot detect a classifier that has learned <strong>cohort identity</strong> rather than <strong>disease biology</strong> — a real risk given the PERMANOVA finding that cohort explains far more compositional variance than IBD status (see <a href="./results.html">Results</a>). LOCO directly tests this: train on three cohorts, evaluate on the entirely held-out fourth cohort, repeated for each of the four cohorts. Unlike the pooled sweep, LOCO runs <strong>ElasticNet only</strong>, on the <code>rfe_full_pool</code> panel, for each feature type — a single train/test split per held-out cohort (not repeated), with its own 20-trial Optuna inner search on the training cohorts.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> held_out_cohort <span class="kw">in</span> cohorts:</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    train_mask <span class="op">=</span> data[<span class="st">"cohort"</span>] <span class="op">!=</span> held_out_cohort</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    test_mask  <span class="op">=</span> data[<span class="st">"cohort"</span>] <span class="op">==</span> held_out_cohort</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    scaler <span class="op">=</span> StandardScaler()  <span class="co"># fit on TRAINING cohorts only -- no leakage from held-out cohort</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    X_train <span class="op">=</span> scaler.fit_transform(X_train_raw)<span class="op">;</span> X_test <span class="op">=</span> scaler.transform(X_test_raw)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    study <span class="op">=</span> optuna.create_study(direction<span class="op">=</span><span class="st">"maximize"</span>, sampler<span class="op">=</span>optuna.samplers.TPESampler(seed<span class="op">=</span><span class="dv">123</span>))</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    study.optimize(objective, n_trials<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    final_model <span class="op">=</span> LogisticRegression(<span class="op">**</span>study.best_params, penalty<span class="op">=</span><span class="st">"elasticnet"</span>, solver<span class="op">=</span><span class="st">"saga"</span>).fit(X_train, y_train)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    y_proba <span class="op">=</span> final_model.predict_proba(X_test)[:, <span class="dv">1</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Source: <code>scripts/python/06_loco_validation.py</code>.</em></p>
+</section>
+<section id="model-interpretability-shap" class="level3" data-number="3.6">
+<h3 data-number="3.6" class="anchored" data-anchor-id="model-interpretability-shap"><span class="header-section-number">3.6</span> Model interpretability: SHAP</h3>
+<p>SHAP (SHapley Additive exPlanations) <span class="citation" data-cites="lundberg2017shap">(<a href="#ref-lundberg2017shap" role="doc-biblioref">Lundberg and Lee 2017</a>)</span> values are computed for the <strong>combined</strong> feature type’s winning ElasticNet model only (<code>scripts/python/05_combined_shap.py</code>) — no separate SHAP run exists for species-only or pathway-only models. <code>LinearExplainer</code> is used on the final refit ElasticNet, giving exact (not sampled/approximate) attributions consistent with the model’s linear decision function.</p>
+</section>
+<section id="statistical-comparison-of-models" class="level3" data-number="3.7">
+<h3 data-number="3.7" class="anchored" data-anchor-id="statistical-comparison-of-models"><span class="header-section-number">3.7</span> Statistical comparison of models</h3>
+<p>Pairwise model comparisons (e.g., ElasticNet vs.&nbsp;each tree ensemble, within a panel) use both a <strong>paired t-test</strong> and a <strong>paired Wilcoxon signed-rank test</strong> across the 5 per-repeat metric values. With only n = 5 paired repeats, Wilcoxon’s exact p-value floors at 0.0625 regardless of effect size — this is called out explicitly in the pipeline’s own output (<code>wilcoxon_underpowered_at_n5</code> flag column) rather than silently reported, and the <strong>paired t-test is used as the primary significance criterion</strong> for this reason.</p>
+<p><em>Source: <code>scripts/python/07_statistical_comparison.py</code>.</em></p>
+
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-lundberg2017shap" class="csl-entry" role="listitem">
+Lundberg, Scott M, and Su-In Lee. 2017. <span>“A Unified Approach to Interpreting Model Predictions.”</span> <em>Advances in Neural Information Processing Systems</em> 30: 4765–74.
+</div>
+<div id="ref-mallick2021maaslin2" class="csl-entry" role="listitem">
+Mallick, Himel, Ali Rahnavard, Lauren J McIver, Siyuan Ma, Yancong Zhang, Long H Nguyen, et al. 2021. <span>“Multivariable Association Discovery in Population-Scale Meta-Omics Studies.”</span> <em>PLOS Computational Biology</em> 17 (11): e1009442. <a href="https://doi.org/10.1371/journal.pcbi.1009442">https://doi.org/10.1371/journal.pcbi.1009442</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/Sanyukta2002\.github\.io\/ML-ibd\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>IBD cross-cohort microbiome pipeline</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

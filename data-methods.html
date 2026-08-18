@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Data &amp; Cohort – IBD Cross-Cohort Microbiome Classification</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-27e1aa2dab5d6404f55602c9c9ab0aa1.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    </a>
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">IBD Cross-Cohort Microbiome Classification</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Background</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./objectives.html"> 
+<span class="menu-text">Objectives</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./data-methods.html" aria-current="page"> 
+<span class="menu-text">Data &amp; Cohort</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./methods.html"> 
+<span class="menu-text">Methods</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./results.html"> 
+<span class="menu-text">Results</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#data-source-and-type" id="toc-data-source-and-type" class="nav-link active" data-scroll-target="#data-source-and-type"><span class="header-section-number">1</span> Data source and type</a></li>
+  <li><a href="#cohort-composition" id="toc-cohort-composition" class="nav-link" data-scroll-target="#cohort-composition"><span class="header-section-number">2</span> Cohort composition</a>
+  <ul class="collapse">
+  <li><a href="#baseline-cohort-sizes-group-ibd-vs.-control" id="toc-baseline-cohort-sizes-group-ibd-vs.-control" class="nav-link" data-scroll-target="#baseline-cohort-sizes-group-ibd-vs.-control"><span class="header-section-number">2.1</span> Baseline cohort sizes (group = IBD vs.&nbsp;control)</a></li>
+  <li><a href="#final-modeling-sample-sizes-by-feature-type" id="toc-final-modeling-sample-sizes-by-feature-type" class="nav-link" data-scroll-target="#final-modeling-sample-sizes-by-feature-type"><span class="header-section-number">2.2</span> Final modeling sample sizes, by feature type</a></li>
+  </ul></li>
+  <li><a href="#feature-filtering" id="toc-feature-filtering" class="nav-link" data-scroll-target="#feature-filtering"><span class="header-section-number">3</span> Feature filtering</a></li>
+  <li><a href="#pipeline-workflow" id="toc-pipeline-workflow" class="nav-link" data-scroll-target="#pipeline-workflow"><span class="header-section-number">4</span> Pipeline workflow</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Data &amp; Cohort</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="data-source-and-type" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="data-source-and-type"><span class="header-section-number">1</span> Data source and type</h2>
+<p>All data originate from <strong>shotgun metagenomic sequencing of stool samples</strong>, accessed through the <a href="https://bioconductor.org/packages/curatedMetagenomicData">curatedMetagenomicData</a> Bioconductor package (package version 3.12.0, confirmed via <code>sessionInfo()</code> inside the pinned analysis container) <span class="citation" data-cites="pasolli2017curatedmetagenomicdata">(<a href="#ref-pasolli2017curatedmetagenomicdata" role="doc-biblioref">Pasolli et al. 2017</a>)</span>. Two feature types are pulled per cohort, each from a separately pinned <code>ExperimentHub</code> snapshot date (<code>config/config.yaml</code>):</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Feature type</th>
+<th>curatedMetagenomicData resource</th>
+<th>What it measures</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Species</strong></td>
+<td><code>relative_abundance</code></td>
+<td>Relative abundance of taxonomically classified microbial species (MetaPhlAn-derived)</td>
+</tr>
+<tr class="even">
+<td><strong>Pathway</strong></td>
+<td><code>pathway_abundance</code></td>
+<td>Relative abundance of MetaCyc functional pathways (HUMAnN-derived)</td>
+</tr>
+</tbody>
+</table>
+<p>Snapshot dates: <code>2021-10-14</code> for HMP_2019_ibdmdb, HallAB_2017, and IjazUZ_2017; <code>2021-03-31</code> for NielsenHB_2014 — pinned explicitly so the same underlying data version is pulled on every re-run, validated with a dry run before each pull.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Known reproducibility caveat
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Unlike <code>relative_abundance</code>/<code>pathway_abundance</code>, curatedMetagenomicData’s <code>sampleMetadata</code> table (subject-level clinical/demographic metadata) is <strong>not</strong> independently version-pinned — it is baked into the installed package version itself. A documented consequence: this rebuild finds 0/141 NielsenHB_2014 samples with non-missing age, versus an original exploratory run’s age-adjusted Tier 2 subset of n=314 across three cohorts (this rebuild: n=173). This is package-version drift in the metadata table, not a pipeline bug — downstream scripts log the actual n observed rather than asserting the original number.</p>
+</div>
+</div>
+</section>
+<section id="cohort-composition" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="cohort-composition"><span class="header-section-number">2</span> Cohort composition</h2>
+<p>Four cohorts were selected (<code>config/config.yaml: cohorts.selected_studies</code>), restricted to stool samples, with NielsenHB_2014 additionally restricted to its Spanish (ESP) subset only (<code>nielsen_country_restriction: "ESP"</code>) to avoid mixing populations within that single study. Where a subject was sampled at multiple time points, only the <strong>earliest baseline sample per subject</strong> was retained (<code>scripts/r/01_cohort_selection.R</code>) — so every count below is a <strong>patient/subject count</strong>, not a longitudinal sample count.</p>
+<section id="baseline-cohort-sizes-group-ibd-vs.-control" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="baseline-cohort-sizes-group-ibd-vs.-control"><span class="header-section-number">2.1</span> Baseline cohort sizes (group = IBD vs.&nbsp;control)</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Cohort</th>
+<th style="text-align: right;">Control (n)</th>
+<th style="text-align: right;">IBD (n)</th>
+<th style="text-align: right;">Total (n)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>HMP_2019_ibdmdb</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">103</td>
+<td style="text-align: right;">130</td>
+</tr>
+<tr class="even">
+<td>HallAB_2017</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">32</td>
+</tr>
+<tr class="odd">
+<td>IjazUZ_2017</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">50</td>
+</tr>
+<tr class="even">
+<td>NielsenHB_2014 (ESP only)</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">82</td>
+<td style="text-align: right;">141</td>
+</tr>
+<tr class="odd">
+<td><strong>Total</strong></td>
+<td style="text-align: right;"><strong>136</strong></td>
+<td style="text-align: right;"><strong>217</strong></td>
+<td style="text-align: right;"><strong>353</strong></td>
+</tr>
+</tbody>
+</table>
+<p><em>Source: <code>results/tables/step3_baseline_counts_by_group.csv</code>. <code>group</code> is derived from curatedMetagenomicData’s <code>disease</code> field: <code>disease == "healthy"</code> → <code>control</code>; <code>disease</code> containing <code>"IBD"</code> → <code>IBD</code> (case-insensitive match; see the <a href="./index.html">Background</a> callout for why no CD/UC subtype is retained).</em></p>
+</section>
+<section id="final-modeling-sample-sizes-by-feature-type" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="final-modeling-sample-sizes-by-feature-type"><span class="header-section-number">2.2</span> Final modeling sample sizes, by feature type</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 21%">
+<col style="width: 21%">
+<col style="width: 21%">
+<col style="width: 21%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Feature type</th>
+<th style="text-align: right;">Control (n)</th>
+<th style="text-align: right;">IBD (n)</th>
+<th style="text-align: right;">Total (n)</th>
+<th style="text-align: right;">Features (final)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Species</td>
+<td style="text-align: right;">136</td>
+<td style="text-align: right;">217</td>
+<td style="text-align: right;">353</td>
+<td style="text-align: right;">151</td>
+</tr>
+<tr class="even">
+<td>Pathway</td>
+<td style="text-align: right;">136</td>
+<td style="text-align: right;">216</td>
+<td style="text-align: right;">352</td>
+<td style="text-align: right;">118</td>
+</tr>
+<tr class="odd">
+<td>Combined (species + pathway)</td>
+<td style="text-align: right;">136</td>
+<td style="text-align: right;">216</td>
+<td style="text-align: right;">352</td>
+<td style="text-align: right;">269 (151 + 118); RFE panels use 37</td>
+</tr>
+</tbody>
+</table>
+<p>The species track’s final modeling n (353) matches the baseline table exactly — no subjects were dropped downstream. The pathway track loses <strong>exactly one IBD subject</strong> (217 → 216) between baseline and the final filtered table; the control count is unaffected (136 in both). This single-subject discrepancy is a real artifact of the pathway abundance filtering/deduplication step and is called out explicitly rather than silently reconciled — see the <a href="#feature-filtering">feature filtering</a> section below for where it occurs.</p>
+</section>
+</section>
+<section id="feature-filtering" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="feature-filtering"><span class="header-section-number">3</span> Feature filtering</h2>
+<p>Both feature types pass through the same two-stage filter — (1) an abundance/prevalence threshold, and (2) a majority-cohort-prevalence rule requiring the feature to be reasonably prevalent within <em>most</em> cohorts individually, not just pooled — followed by correlation-based deduplication (Spearman r &gt; 0.9999999 flagged; exact duplicates collapsed via cluster keep-first-drop-rest, near-duplicates additively collapsed).</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Stage</th>
+<th style="text-align: right;">Species</th>
+<th style="text-align: right;">Pathway</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Total raw features</td>
+<td style="text-align: right;">781</td>
+<td style="text-align: right;">499</td>
+</tr>
+<tr class="even">
+<td>Pass abundance + prevalence filter</td>
+<td style="text-align: right;">161</td>
+<td style="text-align: right;">122</td>
+</tr>
+<tr class="odd">
+<td>Pass majority-cohort-prevalence rule</td>
+<td style="text-align: right;">186</td>
+<td style="text-align: right;">391</td>
+</tr>
+<tr class="even">
+<td><strong>Intersection of both filters</strong></td>
+<td style="text-align: right;"><strong>151</strong></td>
+<td style="text-align: right;"><strong>122</strong></td>
+</tr>
+<tr class="odd">
+<td>Dropped as exact duplicates (dedup)</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="even">
+<td>Collapsed as near-duplicates (dedup)</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><strong>Final feature count</strong></td>
+<td style="text-align: right;"><strong>151</strong></td>
+<td style="text-align: right;"><strong>118</strong></td>
+</tr>
+</tbody>
+</table>
+<p><em>Source: <code>step5_species_filtering_funnel.csv</code>, <code>step_pathway_filtering_funnel.csv</code>, <code>step5b_species_dedup_summary.csv</code>, <code>step_pathway_dedup_summary.csv</code>. Thresholds: <code>species_filter.abund_threshold=0.01</code>, <code>prev_threshold=0.10</code>; <code>pathway_filter.abund_threshold=0.0001</code>, <code>prev_threshold=0.10</code>; both use <code>majority_cohort_prevalence=0.05</code>, <code>majority_cohort_min_n=3</code> (config.yaml).</em></p>
+</section>
+<section id="pipeline-workflow" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="pipeline-workflow"><span class="header-section-number">4</span> Pipeline workflow</h2>
+<p>The pipeline is orchestrated with <strong>Snakemake</strong>, split into two fully parallel tracks (species, pathway) that share identical statistical logic, plus a downstream Python machine-learning stage that consumes both. Execution runs on SLURM (IU Quartz HPC), with R analysis inside an Apptainer container (<code>bioconductor/bioconductor_docker:RELEASE_3_19</code>, R 4.4.1) and Python ML inside a separate conda environment, tracked end-to-end with MLflow.</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart TD
+    A["curatedMetagenomicData\nsampleMetadata + relative_abundance + pathway_abundance"] --&gt; B["01: Cohort selection\n&amp; baseline filtering\n(n=353 subjects)"]
+    B --&gt; C1["02: Species abundance pull"]
+    B --&gt; C2["12: Pathway abundance pull"]
+
+    C1 --&gt; D1["03: Species filter + dedup\n781 → 151 features"]
+    C2 --&gt; D2["13: Pathway filter + dedup\n499 → 118 features"]
+
+    D1 --&gt; E1["04: Diversity + PERMANOVA\n(species)"]
+    D2 --&gt; E2["14: Diversity + PERMANOVA\n(pathway)"]
+
+    D1 --&gt; F1["05: Covariate availability check"]
+    D2 --&gt; F1
+
+    F1 --&gt; G1["06/07: MaAsLin2\nTier1 (n=353) / Tier2 age-adj (n=173)\n(species)"]
+    F1 --&gt; G2["15/16: MaAsLin2\nTier1 / Tier2 age-adj\n(pathway)"]
+
+    D1 --&gt; H1["09: Blocked Wilcoxon\n(species, cohort-blocked)"]
+    D2 --&gt; H2["18: Blocked Wilcoxon\n(pathway, cohort-blocked)"]
+
+    G1 --&gt; I1["08/10: Tier overlap →\n3-way triple-candidates\n(species, n=19)"]
+    H1 --&gt; I1
+    G2 --&gt; I2["17/19: Tier overlap →\n3-way triple-candidates\n(pathway, n=18)"]
+    H2 --&gt; I2
+
+    I1 --&gt; J1["11: RFE panels\n(species: 12 / 17 / 19)"]
+    I2 --&gt; J2["20: RFE panels\n(pathway: 9 / 12 / 18)"]
+
+    J1 --&gt; K["21: Export for Python\n(full filtered tables + panel membership)"]
+    J2 --&gt; K
+
+    K --&gt; L["CLR transform\n(full table, pre-panel-subset)"]
+    L --&gt; M1["02_species_model_sweep.py\n4 models × 3 panels"]
+    L --&gt; M2["03_pathway_model_sweep.py\n4 models × 3 panels"]
+    L --&gt; M3["04_combined_model_sweep.py\n4 models × rfe_full_pool (37 feat.)"]
+
+    M1 --&gt; N["06_loco_validation.py\nElasticNet, rfe_full_pool, per feature type"]
+    M2 --&gt; N
+    M3 --&gt; N
+
+    M3 --&gt; O["05_combined_shap.py\nSHAP on winning combined ElasticNet"]
+    M1 --&gt; P["07_statistical_comparison.py\npaired t-test / Wilcoxon across models"]
+    M2 --&gt; P
+    M3 --&gt; P
+
+    style A fill:#eef2f7,stroke:#333
+    style K fill:#fff3e0,stroke:#333
+    style N fill:#e8f5e9,stroke:#333
+    style O fill:#e8f5e9,stroke:#333
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>Every rule maps to one numbered R script (<code>scripts/r/01</code>–<code>21</code>) or Python script (<code>scripts/python/02</code>–<code>07</code>); the numbering above matches the actual filenames in the repository so any step can be traced directly back to its source.</p>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-pasolli2017curatedmetagenomicdata" class="csl-entry" role="listitem">
+Pasolli, Edoardo, Lucas Schiffer, Paolo Manghi, Audrey Renson, Valerie Obenchain, Duy Tin Truong, et al. 2017. <span>“Accessible, Curated Metagenomic Data Through ExperimentHub.”</span> <em>Nature Methods</em> 14 (11): 1023–24. <a href="https://doi.org/10.1038/nmeth.4468">https://doi.org/10.1038/nmeth.4468</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/Sanyukta2002\.github\.io\/ML-ibd\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>IBD cross-cohort microbiome pipeline</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Built with Quarto</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
