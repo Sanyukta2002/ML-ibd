@@ -1,5 +1,8 @@
 # IBD Cross-Cohort Microbiome Classification Pipeline
 
+![AUROC curves — winning classifiers per feature type](docs/images/auroc_curve.png)
+
+
 A Snakemake-orchestrated, R + Python pipeline classifying inflammatory bowel disease (IBD) status from gut microbiome composition, pooled across 4 independent, publicly available cohorts from curatedMetagenomicData.
 
 **Full write-up, methods, and results: https://sanyukta2002.github.io/ML-ibd/**
