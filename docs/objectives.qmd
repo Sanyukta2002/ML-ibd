@@ -1,0 +1,29 @@
+---
+title: "What We Tried To Do"
+---
+
+## Primary objective
+
+Distinguish **IBD** from **non-IBD (control)** gut microbiome samples using cross-cohort, pooled shotgun metagenomic species and pathway abundance data, via machine-learning classifiers that are validated not just by pooled cross-validation but by explicit **out-of-cohort generalization testing**.
+
+## Specific aims
+
+1. **Characterize cohort structure before touching disease signal.** Quantify how much of the variance in microbial community composition is explained by cohort of origin versus IBD status (PERMANOVA on Bray-Curtis dissimilarity), so that downstream conclusions can be interpreted against that baseline rather than assumed to be disease-specific.
+
+2. **Identify differentially abundant species and pathways between IBD and control**, using three statistically independent methods — MaAsLin2 (all-samples model), MaAsLin2 (age-adjusted subset), and a cohort-blocked Wilcoxon rank-sum test — and require **3-way agreement plus direction agreement** before treating a feature as a validated hit. This is deliberately conservative: any single test can produce false positives driven by one dominant cohort; requiring convergence across three differently-specified tests is the project's main defense against that.
+
+3. **Characterize the pathway (functional) layer separately from the species (taxonomic) layer**, since a priori it is not obvious that pathway-level function will show the same cross-cohort consistency as species-level composition — this project treats that as an empirical question, not an assumption, and the two layers are analyzed in fully parallel but independent tracks.
+
+4. **Reduce the validated feature sets to compact, ranked panels** via Recursive Feature Elimination (RFE, random-forest-based, AUC-optimized), producing three panel sizes per feature type (species and pathway) that trade off predictive performance against parsimony.
+
+5. **Train and compare multiple ML model families** (Random Forest, XGBoost, LightGBM, ElasticNet-penalized Logistic Regression) on each feature panel, using nested cross-validation with Bayesian hyperparameter search, so that model choice — not just feature choice — is empirically justified rather than assumed.
+
+6. **Stress-test generalization with leave-one-cohort-out (LOCO) validation.** Pooled cross-validation cannot detect a model that has learned cohort-specific rather than disease-specific signal; LOCO — training on three cohorts and testing entirely on a fourth, held out cohort — directly probes this failure mode, following the same design used in Ning et al. 2023 [@ning2023ccia].
+
+7. **Interpret the winning model**, using SHAP values to identify which individual features drive its predictions, and cross-reference those features against the independently validated differential-abundance signature — convergence between an ML model's learned importances and an independent statistical test is stronger evidence than either alone.
+
+## What this project deliberately does *not* attempt
+
+- **CD vs. UC subtyping** — out of scope; see the [Background](index.qmd) callout on why.
+- **Causal or mechanistic claims** — this is a classification/association study on cross-sectional, pooled public cohorts; no claim is made about microbiome-driven causation of IBD.
+- **Metabolomics or host transcriptomic integration** — unlike Ning et al. 2023's multi-omics design, this pipeline works from metagenomic species and pathway abundance only; no metabolomic layer is available in the source cohorts used here.

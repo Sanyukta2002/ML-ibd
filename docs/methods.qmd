@@ -1,0 +1,233 @@
+---
+title: "Methods"
+---
+
+Methods are presented in the order the pipeline actually runs them: exploratory/confounder characterization → differential abundance (three independent tests) → feature selection → machine learning. Code snippets are pulled verbatim (trimmed for length) from the actual scripts in `scripts/r/` and `scripts/python/` — not rewritten.
+
+## Part 1 — Statistical methods
+
+### Beta diversity: PERMANOVA on Bray-Curtis dissimilarity
+
+Before drawing any disease-association conclusion, the pipeline explicitly quantifies how much of the compositional variance is attributable to **cohort of origin** versus **IBD status**, using `vegan::adonis2` with marginal (`by = "margin"`) term testing so each term's R² reflects its contribution after accounting for the other. A base model (`cohort + group`) is run on all samples, then three covariate-adjusted submodels (`+ age`, `+ gender`, `+ BMI`) are run on the subset of cohorts where that covariate is actually available.
+
+```r
+bray_dist <- vegdist(abund_matrix, method = "bray")
+permanova_basic <- adonis2(bray_dist ~ cohort + group,
+                            data = meta_for_permanova,
+                            permutations = 999, by = "margin")
+
+run_covariate_permanova <- function(covariate, cohorts_with_covariate) {
+  d <- pooled_data %>% filter(cohort %in% cohorts_with_covariate, !is.na(.data[[covariate]]))
+  bray_sub <- vegdist(as.matrix(d[, taxa_cols]), method = "bray")
+  formula_str <- paste("bray_sub ~ cohort + group +", covariate)
+  adonis2(as.formula(formula_str), data = d[, meta_cols], permutations = 999, by = "margin")
+}
+```
+
+*Source: `scripts/r/04_diversity_permanova.R` (species) / `14_pathway_diversity_permanova.R` (pathway).*
+
+### Alpha diversity: Wilcoxon rank-sum + cohort-adjusted LME
+
+Alpha diversity (Shannon, Simpson, observed richness) is computed on the **full raw abundance table** (pre-filtering, deliberately — filtering thresholds are tuned for differential-abundance testing, not diversity estimation), then tested two ways: an unadjusted Wilcoxon rank-sum test (IBD vs. control, pooled), and a linear mixed-effects model with cohort as a random intercept (`nlme::lme`), to check whether the unadjusted result survives accounting for cohort clustering.
+
+```r
+shannon_idx <- diversity(abund_matrix, index = "shannon")
+wilcox_shannon <- wilcox.test(shannon ~ group, data = diversity_df)
+lme_shannon <- lme(shannon ~ group, random = ~1|cohort, data = diversity_df)
+```
+
+*Source: `scripts/r/04_diversity_permanova.R`, lines 82–117.*
+
+### Differential abundance, Tier 1: MaAsLin2 (all samples)
+
+[MaAsLin2](https://doi.org/10.1371/journal.pcbi.1009442) [@mallick2021maaslin2] is run with `group` (control vs. IBD) as a fixed effect and `cohort` as a random effect, on the full sample set. TSS normalization, log transform, linear-model backend, BH FDR correction (`config.yaml: maaslin2`). `control` is explicitly releveled as the reference so a positive coefficient means *enriched in IBD*.
+
+```r
+input_metadata$group <- relevel(factor(input_metadata$group), ref = "control")
+
+fit_tier1 <- Maaslin2(
+  input_data      = input_data,
+  input_metadata  = input_metadata,
+  fixed_effects   = c("group"),
+  random_effects  = c("cohort"),
+  normalization   = "TSS",
+  transform       = "LOG",
+  analysis_method = "LM",
+  correction      = "BH",
+  standardize     = TRUE
+)
+```
+
+*Source: `scripts/r/06_maaslin2_tier1.R`.*
+
+### Differential abundance, Tier 2: MaAsLin2 (age-adjusted subset)
+
+A robustness check on the subset of cohorts/subjects with non-missing age (`covariate_availability.rds`, derived empirically from the data rather than hardcoded — see the reproducibility caveat on the [Data & Cohort](data-methods.qmd) page), adding `age` as a second fixed effect alongside `group`.
+
+```r
+fit_tier2 <- Maaslin2(
+  input_data      = input_data_t2,
+  input_metadata  = input_metadata_t2,
+  fixed_effects   = c("group", "age"),
+  random_effects  = c("cohort"),
+  normalization   = "TSS", transform = "LOG",
+  analysis_method = "LM",  correction = "BH",
+  standardize     = TRUE
+)
+tier2_group_results <- fit_tier2$results %>% filter(metadata == "group")
+```
+
+*Source: `scripts/r/07_maaslin2_tier2_age.R`. Note: `plot_scatter=FALSE` is set in both tiers as a workaround for a MaAsLin2/ggplot2 version incompatibility in its continuous-covariate scatter-plot code (confirmed via log: model fit and `$results` extraction are unaffected).*
+
+### Differential abundance, blocked Wilcoxon test
+
+An independent, non-parametric test: a **cohort-blocked** Wilcoxon rank-sum test (`coin::wilcox_test`, block = cohort, conditional/permutation-based null distribution), run separately per feature. `coin`'s raw test statistic does not follow MaAsLin2's "positive = enriched in IBD" sign convention, so the pipeline flips the sign and **empirically verifies** the correction against real group medians before trusting it (hard `stopifnot`, not just a comment):
+
+```r
+wt <- coin::wilcox_test(abundance ~ group | cohort, data = df, distribution = "asymptotic")
+statistic_corrected <- -as.numeric(coin::statistic(wt))
+
+# Empirical verification, not assumed:
+ibd_higher <- medians_check$median_abund[medians_check$group == "IBD"] >
+              medians_check$median_abund[medians_check$group == "control"]
+corrected_positive <- corrected_stat > 0
+stopifnot(ibd_higher == corrected_positive)  # hard stop if the sign convention doesn't hold
+```
+
+*Source: `scripts/r/09_species_wilcoxon.R`. FDR correction: BH, same threshold (q < 0.05) as MaAsLin2.*
+
+### 3-way convergent feature selection ("triple-candidates")
+
+A feature is only trusted if **all three** tests agree: MaAsLin2 Tier 1 (q < 0.05) ∩ MaAsLin2 Tier 2 (q < 0.05) ∩ blocked Wilcoxon (q < 0.05) — then a **direction-agreement check** (MaAsLin2 coefficient sign vs. corrected Wilcoxon statistic sign) — then a third, independent effect-size check using **generalized fold change (gFC)**, a quantile-based, non-parametric fold-change estimate robust to zero-inflation:
+
+```r
+compute_gfc <- function(x, group, q_range) {
+  x_ibd <- x[group == "IBD"]; x_control <- x[group == "control"]
+  pc <- min(x[x > 0], na.rm = TRUE) / 2
+  q_ibd     <- quantile(log10(x_ibd + pc), probs = q_range, na.rm = TRUE)
+  q_control <- quantile(log10(x_control + pc), probs = q_range, na.rm = TRUE)
+  mean(q_ibd - q_control)
+}
+# q_range: seq(0.1, 0.9, 0.05) -- config.yaml: gfc.quantile_range
+
+triple_candidates$gfc_maaslin_agree <- sign(triple_candidates$gFC) == sign(triple_candidates$coef_maaslin_tier1)
+triple_candidates$gfc_wilcox_agree  <- sign(triple_candidates$gFC) == sign(triple_candidates$statistic_wilcox_corrected)
+```
+
+Only features passing the intersection, the direction check, **and** the gFC agreement check on both other tests survive as "triple-candidates." *Source: `scripts/r/10_species_triple_candidates.R` (mirrored for pathway in `19_pathway_triple_candidates.R`).* Results: **19 species** and **18 pathways** survived this full pipeline (see [Results](results.qmd)).
+
+## Part 2 — Feature selection: Recursive Feature Elimination (RFE)
+
+The triple-candidate pool (19 species / 18 pathways) is further reduced via **Recursive Feature Elimination** (`caret::rfe`), random-forest-based, AUC-optimized (`twoClassSummary`), 10-fold CV, producing a cross-validated AUROC-vs-panel-size curve. Three panels are derived from each curve:
+
+- **`rfe_optimum`** — the panel size with the single best cross-validated AUROC (`which.max(results_df$ROC)`)
+- **`rfe_parsimony`** — the smallest panel within 1% tolerance of the optimum (`caret::pickSizeTolerance(..., tol = 1)`)
+- **`rfe_full_pool`** — the entire triple-candidate pool, unranked, as an upper-bound reference
+
+```r
+rfe_result <- rfe(x = feat_matrix, y = y, sizes = 2:n_candidates,
+                   rfeControl = ctrl_auc, metric = "ROC")
+
+optimum_size   <- results_df$Variables[which.max(results_df$ROC)]
+parsimony_size <- caret::pickSizeTolerance(results_df, metric = "ROC", tol = 1, maximize = TRUE)
+```
+
+*Source: `scripts/r/11_species_rfe.R`, lines 68–97 (mirrored in `20_pathway_rfe.R`). Panel design explicitly credited to the RFE-to-a-compact-panel approach used in Ning et al. 2023, Zheng et al. 2024, and Zhou et al. 2024 (script header comment).* Resulting panel sizes: species — 12 / 17 / 19; pathway — 9 / 12 / 18 (see [Results](results.qmd)).
+
+## Part 3 — Machine learning
+
+### Feature transform: centered log-ratio (CLR)
+
+Before any modeling, the **full filtered feature table** (151 species or 118 pathways — not yet subset to an RFE panel) is CLR-transformed. This ordering matters: CLR is not sub-compositionally coherent, so computing it on a pre-cut panel would use the wrong geometric-mean reference; panel subsetting always happens *after* CLR, never before.
+
+```python
+def clr_transform(df, pseudocount_method="half_min_nonzero"):
+    values = df.values.astype(float)
+    pseudocount = values[values > 0].min() / 2
+    log_vals = np.log(values + pseudocount)
+    row_means = log_vals.mean(axis=1, keepdims=True)
+    clr_vals = log_vals - row_means
+    clr_df = pd.DataFrame(clr_vals, index=df.index, columns=df.columns)
+    assert clr_df.sum(axis=1).abs().max() < 1e-6  # CLR rows must sum to ~0
+    return clr_df, pseudocount
+```
+
+*Source: `scripts/python/utils/cv_utils.py`, lines 39–80.*
+
+### Nested cross-validation with Bayesian hyperparameter search
+
+Every model/panel combination is evaluated with the same nested-CV engine: an **outer loop** of `RepeatedStratifiedKFold` (10 splits × 5 repeats = 50 outer folds, `random_state=123`) provides untouched held-out test folds; for each outer training fold, an **inner** Optuna study (TPE sampler, 5-fold `StratifiedKFold`, 30 trials, optimizing mean inner-fold ROC AUC) searches hyperparameters; the best inner configuration is refit on the full outer-training fold and evaluated once on its untouched outer-test fold.
+
+```python
+outer_cv = RepeatedStratifiedKFold(n_splits=10, n_repeats=5, random_state=123)
+for fold_num, (train_idx, test_idx) in enumerate(outer_cv.split(X_arr, y_arr)):
+    def objective(trial):
+        model = get_model_for_trial(trial, model_name)
+        inner_cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
+        scores = [roc_auc_score(y_train[val], model.fit(X_train[tr], y_train[tr]).predict_proba(X_train[val])[:, 1])
+                  for tr, val in inner_cv.split(X_train, y_train)]
+        return float(np.mean(scores))
+
+    study = optuna.create_study(direction="maximize", sampler=optuna.samplers.TPESampler(seed=123))
+    study.optimize(objective, n_trials=30)
+    final_model = get_model_for_trial(study.best_params, model_name).fit(X_train, y_train)
+    y_proba = final_model.predict_proba(X_test)[:, 1]
+```
+
+Per-repeat metrics are computed by averaging the 10 **fold-level** metrics within each repeat — never by pooling raw fold rows together, which would pseudo-replicate the confidence interval:
+
+```python
+def aggregate_per_repeat(fold_results_df, n_splits):
+    df = fold_results_df.copy()
+    df["repeat_id"] = df["fold_num"] // n_splits
+    metric_cols = ["auroc", "auprc", "sensitivity", "specificity", "precision", "f1", "accuracy"]
+    return df.groupby("repeat_id")[metric_cols].mean().reset_index()
+```
+
+*Source: `scripts/python/utils/cv_utils.py`, `run_nested_cv_optuna()` (lines 187–299) and `aggregate_per_repeat()` (lines 99–109).*
+
+### Model families
+
+Four model families are evaluated on every feature panel, so the model choice is empirically justified rather than assumed — following the same "sweep several algorithms, don't presuppose a winner" discipline used in Zhou et al. 2024's CRC/CRA screen:
+
+| Model | Library | Notes |
+|---|---|---|
+| Random Forest | scikit-learn | scale-invariant, bare estimator |
+| XGBoost | xgboost | scale-invariant, bare estimator |
+| LightGBM | lightgbm | scale-invariant, bare estimator |
+| ElasticNet-penalized Logistic Regression | scikit-learn | wrapped in `Pipeline(StandardScaler, LogisticRegression(penalty="elasticnet", solver="saga"))` — scaler is refit fresh inside every fold, so no leakage |
+
+Sweep scope: species — 4 models × 3 panels = 12 runs; pathway — 4 models × 3 panels = 12 runs; combined (species + pathway concatenated post-CLR, `species__`/`pathway__` prefixed) — 4 models × 1 fixed panel (`rfe_full_pool`, 37 features) = 4 runs. 28 nested-CV runs total.
+
+### Evaluation metrics
+
+AUROC and AUPRC are the primary metrics (via `roc_auc_score`/`average_precision_score` on held-out fold predictions); sensitivity, specificity, precision, F1, and accuracy are also logged per fold at a 0.5 probability threshold. All metrics, per-repeat values, and raw out-of-fold predictions (`y_true`/`y_proba`) are logged as MLflow artifacts for every run.
+
+### Leave-one-cohort-out (LOCO) validation
+
+Pooled cross-validation cannot detect a classifier that has learned **cohort identity** rather than **disease biology** — a real risk given the PERMANOVA finding that cohort explains far more compositional variance than IBD status (see [Results](results.qmd)). LOCO directly tests this: train on three cohorts, evaluate on the entirely held-out fourth cohort, repeated for each of the four cohorts. Unlike the pooled sweep, LOCO runs **ElasticNet only**, on the `rfe_full_pool` panel, for each feature type — a single train/test split per held-out cohort (not repeated), with its own 20-trial Optuna inner search on the training cohorts.
+
+```python
+for held_out_cohort in cohorts:
+    train_mask = data["cohort"] != held_out_cohort
+    test_mask  = data["cohort"] == held_out_cohort
+    scaler = StandardScaler()  # fit on TRAINING cohorts only -- no leakage from held-out cohort
+    X_train = scaler.fit_transform(X_train_raw); X_test = scaler.transform(X_test_raw)
+
+    study = optuna.create_study(direction="maximize", sampler=optuna.samplers.TPESampler(seed=123))
+    study.optimize(objective, n_trials=20)
+    final_model = LogisticRegression(**study.best_params, penalty="elasticnet", solver="saga").fit(X_train, y_train)
+    y_proba = final_model.predict_proba(X_test)[:, 1]
+```
+
+*Source: `scripts/python/06_loco_validation.py`.*
+
+### Model interpretability: SHAP
+
+SHAP (SHapley Additive exPlanations) [@lundberg2017shap] values are computed for the **combined** feature type's winning ElasticNet model only (`scripts/python/05_combined_shap.py`) — no separate SHAP run exists for species-only or pathway-only models. `LinearExplainer` is used on the final refit ElasticNet, giving exact (not sampled/approximate) attributions consistent with the model's linear decision function.
+
+### Statistical comparison of models
+
+Pairwise model comparisons (e.g., ElasticNet vs. each tree ensemble, within a panel) use both a **paired t-test** and a **paired Wilcoxon signed-rank test** across the 5 per-repeat metric values. With only n = 5 paired repeats, Wilcoxon's exact p-value floors at 0.0625 regardless of effect size — this is called out explicitly in the pipeline's own output (`wilcoxon_underpowered_at_n5` flag column) rather than silently reported, and the **paired t-test is used as the primary significance criterion** for this reason.
+
+*Source: `scripts/python/07_statistical_comparison.py`.*

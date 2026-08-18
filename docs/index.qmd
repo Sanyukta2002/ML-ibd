@@ -1,0 +1,34 @@
+---
+title: "Background"
+subtitle: "IBD Cross-Cohort Microbiome Classification Pipeline"
+---
+
+## Overview
+
+Inflammatory bowel disease (IBD) — comprising Crohn's disease (CD) and ulcerative colitis (UC) — is a chronic relapsing inflammatory condition of the gastrointestinal tract, currently diagnosed through invasive endoscopic and histological workup. Over the past decade, shotgun metagenomic sequencing of stool has repeatedly shown that gut microbial community composition differs systematically between IBD patients and healthy individuals, motivating interest in the gut microbiome as a non-invasive diagnostic signal.
+
+A persistent obstacle to translating that observation into a usable diagnostic tool is **cross-cohort inconsistency**: microbial signatures discovered in one study population frequently fail to reproduce in another, because cohort of origin (sequencing center, geography, diet, DNA extraction protocol) is itself a strong driver of microbiome composition — often stronger than disease status. Any classifier trained naively on pooled data risks learning cohort identity rather than disease biology.
+
+This project builds an end-to-end, reproducible Snakemake pipeline that:
+
+1. Pools four independently collected, publicly available IBD metagenomic cohorts from [curatedMetagenomicData](https://bioconductor.org/packages/curatedMetagenomicData) [@pasolli2017curatedmetagenomicdata],
+2. Explicitly tests for and accounts for cohort-driven compositional variance before drawing any disease-association conclusions,
+3. Identifies differentially abundant taxa and functional pathways using **three independent statistical approaches**, requiring agreement across all three before a feature is trusted, and
+4. Builds and rigorously cross-validates machine-learning classifiers — including a leave-one-cohort-out (LOCO) generalization test — to evaluate whether the resulting microbial signature can distinguish IBD from non-IBD gut microbiomes in samples the model has never seen.
+
+## Why this design
+
+The analysis design is directly inspired by three published cross-cohort microbiome-ML studies made available alongside this project (see `ML-ibd/*.pdf`):
+
+- **Ning et al. 2023, *Nature Communications*** [@ning2023ccia] — cross-cohort integrative analysis (CCIA) of 9 metagenomic IBD cohorts, combining differential abundance testing across cohorts with random-forest diagnostic models validated via cohort-to-cohort transfer and leave-one-cohort-out (LOCO) analysis. This project's overall structure — pool cohorts, test for cohort effects, screen features for cross-cohort consistency, then validate with LOCO — mirrors this paper's workflow directly.
+- **Zhou et al. 2024, *Frontiers in Molecular Biosciences*** [@zhou2024crc] — cross-cohort feature screening for colorectal cancer/adenoma diagnosis, using SHAP-based feature intersection across cohorts and comparison of multiple ML algorithms (XGBoost, LightGBM, Random Forest, Logistic Regression, SVM, k-NN) before selecting a final model family. This project's model sweep (four algorithm families evaluated per feature panel, described in [Methods](methods.qmd)) follows the same "don't assume one model wins" discipline.
+- **Zheng et al. 2024, *Nature Medicine*** [@zheng2024ibd] — noninvasive, microbiome-based diagnosis of IBD, motivating the overall clinical framing: can gut microbiome composition alone, without endoscopy, support an IBD vs. non-IBD screening decision.
+
+## Clinical / scientific question
+
+**Given fecal shotgun metagenomic species- and pathway-level abundance profiles pooled across four independent cohorts, can gut microbiome composition distinguish individuals with IBD from non-IBD individuals, using a signature that is (a) statistically consistent across cohorts and (b) validated on cohorts the model was not trained on?**
+
+::: {.callout-note}
+## Scope: binary IBD vs. non-IBD, not CD vs. UC
+The four cohorts pooled in this pipeline are labeled by `disease` status in curatedMetagenomicData's `sampleMetadata`, which this project collapses to a binary **IBD vs. control (non-IBD)** group at the cohort-selection step (`scripts/r/01_cohort_selection.R`): samples coded `"healthy"` become `control`, and any sample whose `disease` field contains `"IBD"` becomes `IBD`. All statistical testing, differential abundance analysis, and machine-learning models in this project operate on that binary label — **no CD-vs-UC subtype distinction is part of this analysis.** Both Ning et al. and Zheng et al. note the same binary framing for their primary diagnostic models; Ning et al. additionally builds a *separate*, secondary CD-vs-UC sub-panel from a different, smaller feature set — this project does not attempt that secondary analysis, since subtype labels are not retained past the cohort-selection step here.
+:::

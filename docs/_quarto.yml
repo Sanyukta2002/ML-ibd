@@ -1,0 +1,40 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "IBD Cross-Cohort Microbiome Classification"
+  description: "Cross-cohort gut microbiome differential abundance and machine-learning classification of inflammatory bowel disease"
+  navbar:
+    background: dark
+    left:
+      - href: index.qmd
+        text: Background
+      - href: objectives.qmd
+        text: Objectives
+      - href: data-methods.qmd
+        text: "Data & Cohort"
+      - href: methods.qmd
+        text: Methods
+      - href: results.qmd
+        text: Results
+  page-footer:
+    left: "IBD cross-cohort microbiome pipeline"
+    right: "Built with Quarto"
+  sidebar: false
+
+format:
+  html:
+    theme: flatly
+    css: styles.css
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-copy: true
+    code-overflow: wrap
+    fig-cap-location: bottom
+    grid:
+      body-width: 950px
+    link-external-newwindow: true
+
+bibliography: references.bib

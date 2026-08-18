@@ -1,0 +1,119 @@
+---
+title: "Data & Cohort"
+---
+
+## Data source and type
+
+All data originate from **shotgun metagenomic sequencing of stool samples**, accessed through the [curatedMetagenomicData](https://bioconductor.org/packages/curatedMetagenomicData) Bioconductor package (package version 3.12.0, confirmed via `sessionInfo()` inside the pinned analysis container) [@pasolli2017curatedmetagenomicdata]. Two feature types are pulled per cohort, each from a separately pinned `ExperimentHub` snapshot date (`config/config.yaml`):
+
+| Feature type | curatedMetagenomicData resource | What it measures |
+|---|---|---|
+| **Species** | `relative_abundance` | Relative abundance of taxonomically classified microbial species (MetaPhlAn-derived) |
+| **Pathway** | `pathway_abundance` | Relative abundance of MetaCyc functional pathways (HUMAnN-derived) |
+
+Snapshot dates: `2021-10-14` for HMP_2019_ibdmdb, HallAB_2017, and IjazUZ_2017; `2021-03-31` for NielsenHB_2014 — pinned explicitly so the same underlying data version is pulled on every re-run, validated with a dry run before each pull.
+
+::: {.callout-important}
+## Known reproducibility caveat
+Unlike `relative_abundance`/`pathway_abundance`, curatedMetagenomicData's `sampleMetadata` table (subject-level clinical/demographic metadata) is **not** independently version-pinned — it is baked into the installed package version itself. A documented consequence: this rebuild finds 0/141 NielsenHB_2014 samples with non-missing age, versus an original exploratory run's age-adjusted Tier 2 subset of n=314 across three cohorts (this rebuild: n=173). This is package-version drift in the metadata table, not a pipeline bug — downstream scripts log the actual n observed rather than asserting the original number.
+:::
+
+## Cohort composition
+
+Four cohorts were selected (`config/config.yaml: cohorts.selected_studies`), restricted to stool samples, with NielsenHB_2014 additionally restricted to its Spanish (ESP) subset only (`nielsen_country_restriction: "ESP"`) to avoid mixing populations within that single study. Where a subject was sampled at multiple time points, only the **earliest baseline sample per subject** was retained (`scripts/r/01_cohort_selection.R`) — so every count below is a **patient/subject count**, not a longitudinal sample count.
+
+### Baseline cohort sizes (group = IBD vs. control)
+
+| Cohort | Control (n) | IBD (n) | Total (n) |
+|---|---:|---:|---:|
+| HMP_2019_ibdmdb | 27 | 103 | 130 |
+| HallAB_2017 | 12 | 20 | 32 |
+| IjazUZ_2017 | 38 | 12 | 50 |
+| NielsenHB_2014 (ESP only) | 59 | 82 | 141 |
+| **Total** | **136** | **217** | **353** |
+
+*Source: `results/tables/step3_baseline_counts_by_group.csv`. `group` is derived from curatedMetagenomicData's `disease` field: `disease == "healthy"` → `control`; `disease` containing `"IBD"` → `IBD` (case-insensitive match; see the [Background](index.qmd) callout for why no CD/UC subtype is retained).*
+
+### Final modeling sample sizes, by feature type
+
+| Feature type | Control (n) | IBD (n) | Total (n) | Features (final) |
+|---|---:|---:|---:|---:|
+| Species | 136 | 217 | 353 | 151 |
+| Pathway | 136 | 216 | 352 | 118 |
+| Combined (species + pathway) | 136 | 216 | 352 | 269 (151 + 118); RFE panels use 37 |
+
+The species track's final modeling n (353) matches the baseline table exactly — no subjects were dropped downstream. The pathway track loses **exactly one IBD subject** (217 → 216) between baseline and the final filtered table; the control count is unaffected (136 in both). This single-subject discrepancy is a real artifact of the pathway abundance filtering/deduplication step and is called out explicitly rather than silently reconciled — see the [feature filtering](#feature-filtering) section below for where it occurs.
+
+## Feature filtering {#feature-filtering}
+
+Both feature types pass through the same two-stage filter — (1) an abundance/prevalence threshold, and (2) a majority-cohort-prevalence rule requiring the feature to be reasonably prevalent within *most* cohorts individually, not just pooled — followed by correlation-based deduplication (Spearman r > 0.9999999 flagged; exact duplicates collapsed via cluster keep-first-drop-rest, near-duplicates additively collapsed).
+
+| Stage | Species | Pathway |
+|---|---:|---:|
+| Total raw features | 781 | 499 |
+| Pass abundance + prevalence filter | 161 | 122 |
+| Pass majority-cohort-prevalence rule | 186 | 391 |
+| **Intersection of both filters** | **151** | **122** |
+| Dropped as exact duplicates (dedup) | 0 | 3 |
+| Collapsed as near-duplicates (dedup) | 0 | 1 |
+| **Final feature count** | **151** | **118** |
+
+*Source: `step5_species_filtering_funnel.csv`, `step_pathway_filtering_funnel.csv`, `step5b_species_dedup_summary.csv`, `step_pathway_dedup_summary.csv`. Thresholds: `species_filter.abund_threshold=0.01`, `prev_threshold=0.10`; `pathway_filter.abund_threshold=0.0001`, `prev_threshold=0.10`; both use `majority_cohort_prevalence=0.05`, `majority_cohort_min_n=3` (config.yaml).*
+
+## Pipeline workflow
+
+The pipeline is orchestrated with **Snakemake**, split into two fully parallel tracks (species, pathway) that share identical statistical logic, plus a downstream Python machine-learning stage that consumes both. Execution runs on SLURM (IU Quartz HPC), with R analysis inside an Apptainer container (`bioconductor/bioconductor_docker:RELEASE_3_19`, R 4.4.1) and Python ML inside a separate conda environment, tracked end-to-end with MLflow.
+
+```{mermaid}
+flowchart TD
+    A["curatedMetagenomicData\nsampleMetadata + relative_abundance + pathway_abundance"] --> B["01: Cohort selection\n& baseline filtering\n(n=353 subjects)"]
+    B --> C1["02: Species abundance pull"]
+    B --> C2["12: Pathway abundance pull"]
+
+    C1 --> D1["03: Species filter + dedup\n781 → 151 features"]
+    C2 --> D2["13: Pathway filter + dedup\n499 → 118 features"]
+
+    D1 --> E1["04: Diversity + PERMANOVA\n(species)"]
+    D2 --> E2["14: Diversity + PERMANOVA\n(pathway)"]
+
+    D1 --> F1["05: Covariate availability check"]
+    D2 --> F1
+
+    F1 --> G1["06/07: MaAsLin2\nTier1 (n=353) / Tier2 age-adj (n=173)\n(species)"]
+    F1 --> G2["15/16: MaAsLin2\nTier1 / Tier2 age-adj\n(pathway)"]
+
+    D1 --> H1["09: Blocked Wilcoxon\n(species, cohort-blocked)"]
+    D2 --> H2["18: Blocked Wilcoxon\n(pathway, cohort-blocked)"]
+
+    G1 --> I1["08/10: Tier overlap →\n3-way triple-candidates\n(species, n=19)"]
+    H1 --> I1
+    G2 --> I2["17/19: Tier overlap →\n3-way triple-candidates\n(pathway, n=18)"]
+    H2 --> I2
+
+    I1 --> J1["11: RFE panels\n(species: 12 / 17 / 19)"]
+    I2 --> J2["20: RFE panels\n(pathway: 9 / 12 / 18)"]
+
+    J1 --> K["21: Export for Python\n(full filtered tables + panel membership)"]
+    J2 --> K
+
+    K --> L["CLR transform\n(full table, pre-panel-subset)"]
+    L --> M1["02_species_model_sweep.py\n4 models × 3 panels"]
+    L --> M2["03_pathway_model_sweep.py\n4 models × 3 panels"]
+    L --> M3["04_combined_model_sweep.py\n4 models × rfe_full_pool (37 feat.)"]
+
+    M1 --> N["06_loco_validation.py\nElasticNet, rfe_full_pool, per feature type"]
+    M2 --> N
+    M3 --> N
+
+    M3 --> O["05_combined_shap.py\nSHAP on winning combined ElasticNet"]
+    M1 --> P["07_statistical_comparison.py\npaired t-test / Wilcoxon across models"]
+    M2 --> P
+    M3 --> P
+
+    style A fill:#eef2f7,stroke:#333
+    style K fill:#fff3e0,stroke:#333
+    style N fill:#e8f5e9,stroke:#333
+    style O fill:#e8f5e9,stroke:#333
+```
+
+Every rule maps to one numbered R script (`scripts/r/01`–`21`) or Python script (`scripts/python/02`–`07`); the numbering above matches the actual filenames in the repository so any step can be traced directly back to its source.

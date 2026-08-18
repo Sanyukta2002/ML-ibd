@@ -138,7 +138,7 @@ p_simpson  <- make_diversity_panel("simpson",  "Simpson diversity index (1\u2212
 
 combined_diversity_plot <- p_richness + p_shannon + p_simpson +
   plot_annotation(title = "Alpha diversity: IBD vs. control",
-                   subtitle = paste0("Wilcoxon rank-sum test | n = ", n_control, " control, ", n_ibd, " IBD"))
+                  subtitle = paste0("Wilcoxon rank-sum test | n = ", n_control, " control, ", n_ibd, " IBD"))
 
 save_figure(combined_diversity_plot, "step7_diversity_combined", width = 12, height = 5)
 
