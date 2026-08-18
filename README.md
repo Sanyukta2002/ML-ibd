@@ -5,7 +5,7 @@
 
 A Snakemake-orchestrated, R + Python pipeline classifying inflammatory bowel disease (IBD) status from gut microbiome composition, pooled across 4 independent, publicly available cohorts from curatedMetagenomicData.
 
-<img width="906" height="873" alt="image" src="https://github.com/user-attachments/assets/2f55438a-4ece-4ffa-8c38-86c635a51bc4" />
+
 
 
 **Full write-up, methods, and results: https://sanyukta2002.github.io/ML-ibd/**
