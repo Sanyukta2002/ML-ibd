@@ -1,6 +1,8 @@
 # IBD Cross-Cohort Microbiome Classification Pipeline
 
-![AUROC curves — winning classifiers per feature type](docs/images/auroc_curve.png)
+![Pipeline workflow overview](docs/images/workflow.png)
+
+
 
 
 A Snakemake-orchestrated, R + Python pipeline classifying inflammatory bowel disease (IBD) status from gut microbiome composition, pooled across 4 independent, publicly available cohorts from curatedMetagenomicData.
@@ -17,6 +19,9 @@ Cohort structure (sequencing center, geography, population) is often a stronger 
 **Cohorts:** HMP_2019_ibdmdb, HallAB_2017, IjazUZ_2017, NielsenHB_2014 (ESP subjects only). 353 pooled samples (217 IBD, 136 control), baseline visit only per subject.
 
 ## Key Results
+
+![AUROC curves — winning classifiers per feature type](docs/images/auroc_curve.png)
+
 
 | Feature type | Best model / panel | Pooled AUROC | Mean LOCO AUROC |
 |---|---|---|---|
