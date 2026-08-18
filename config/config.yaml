@@ -53,10 +53,7 @@ maaslin2:
   correction: "BH"
   qval_threshold_primary: 0.05
   qval_threshold_secondary: 0.25
-  tier2_age_cohorts:
-    - HMP_2019_ibdmdb
-    - IjazUZ_2017
-    - NielsenHB_2014
+  
 
 wilcoxon:
   qval_threshold: 0.05
@@ -67,7 +64,7 @@ gfc:
 rfe:
   seed: 123
   cv_folds: 10
-  panel_sizes: [7, 13, 19]  # 19 capped to match available triple-candidate pool (was 20 for original 35-species pool)
+  
 
 python_preprocessing:
   clr_transform: true
